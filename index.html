@@ -1,0 +1,1043 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Orçamento Fácil - Daniel Negrini</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Roboto', sans-serif; }
+        body { background: #f0f4f8; padding: 1.5rem; color: #1e293b; display: flex; flex-direction: column; min-height: 100vh; }
+        .container { max-width: 1300px; margin: 0 auto; background: white; border-radius: 2rem; box-shadow: 0 20px 35px -12px rgba(0,0,0,0.1); overflow: hidden; padding: 1.8rem 2rem; transition: all 0.2s; flex: 1; }
+        .header-empresa { background: linear-gradient(135deg, #0f2b3d 0%, #1b4a6e 100%); margin: -1.8rem -2rem 1.8rem -2rem; padding: 1.5rem 2rem; color: white; display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 0.8rem; position: relative; }
+        .empresa-nome { font-size: 1.8rem; font-weight: 700; letter-spacing: -0.3px; display: flex; flex-direction: column; }
+        .empresa-nome span { display: flex; align-items: center; gap: 10px; }
+        .btn-config { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 10px; border-radius: 8px; cursor: pointer; font-size: 1rem; transition: 0.2s; }
+        .btn-config:hover { background: rgba(255,255,255,0.4); }
+        .empresa-detalhes { font-size: 0.9rem; font-weight: 400; margin-top: 0.3rem; opacity: 0.9; }
+        .empresa-contato { font-size: 1.1rem; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 40px; backdrop-filter: blur(4px); }
+        .empresa-contato i { margin-right: 6px; }
+        h2 { font-size: 1.5rem; margin: 0 0 0.8rem 0; color: #0c4e6e; border-left: 5px solid #2c7da0; padding-left: 0.9rem; }
+        .form-card { background: #f9fafc; border-radius: 1.2rem; padding: 1.3rem; margin-bottom: 1.5rem; box-shadow: 0 2px 6px rgba(0,0,0,0.05); border: 1px solid #e2edf2; }
+        .form-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+        .input-group { flex: 1; min-width: 150px; }
+        .input-group label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5a74; margin-bottom: 0.3rem; }
+        .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 0.7rem 0.8rem; border: 1px solid #cbdde6; border-radius: 0.9rem; font-size: 0.95rem; transition: 0.2s; background: white; }
+        .input-group input:focus, .input-group select:focus, .input-group textarea:focus { outline: none; border-color: #2c7da0; box-shadow: 0 0 0 3px rgba(44,125,160,0.2); }
+        
+        input#numeroOS { background-color: #e2e8f0; font-weight: bold; color: #475569; cursor: not-allowed; border-color: #cbdde6; }
+        input#numeroOS:focus { box-shadow: none; border-color: #cbdde6; }
+        select#statusOrcamento { font-weight: bold; }
+        select#statusOrcamento option[value="Orçamento"] { color: #64748b; }
+        select#statusOrcamento option[value="Confirmado"] { color: #166534; font-weight: bold; }
+        
+        /* Novas Cores do Status de Produção */
+        select#andamentoPedido { font-weight: bold; }
+        select#andamentoPedido option[value="Produção"] { color: #d97706; }
+        select#andamentoPedido option[value="Aguardando Retirada"] { color: #2563eb; }
+        select#andamentoPedido option[value="Entregue"] { color: #059669; }
+
+        .btn { border: none; background: #e2e8f0; padding: 0.7rem 1.3rem; border-radius: 2rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .btn-primary { background: #1f6392; color: white; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
+        .btn-primary:hover { background: #0e4b70; transform: scale(0.97); }
+        .btn-success { background: #2b8c5e; color: white; }
+        .btn-danger { background: #e53e3e; color: white; }
+        .btn-outline { background: transparent; border: 1px solid #bdd3e0; color: #1f6392; }
+        .btn-outline:hover { background: #eef3f7; }
+        .action-bar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin: 1.2rem 0 0.8rem; }
+        .table-wrapper { overflow-x: auto; border-radius: 1.2rem; border: 1px solid #e2edf2; background: white; margin: 1rem 0 1rem; }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+        th { background: #eef2f7; padding: 12px 10px; text-align: left; font-weight: 700; color: #1f4662; }
+        td { padding: 12px 10px; border-bottom: 1px solid #e9edf2; vertical-align: middle; }
+        tr:last-child td { border-bottom: none; }
+        .total-geral { text-align: right; font-size: 1.5rem; font-weight: 800; background: #eef6fc; padding: 1rem 1.5rem; border-radius: 1rem; margin: 1rem 0; color: #0f3b4f; }
+        .acoes i { margin: 0 5px; cursor: pointer; font-size: 1.1rem; transition: 0.1s; }
+        .fa-edit { color: #2c7da0; }
+        .fa-trash-alt { color: #c52828; }
+        .badge-editing { background: #fef9e3; border-left: 6px solid #f59e0b; padding: 0.5rem 1rem; border-radius: 1rem; font-size: 0.8rem; margin-bottom: 1rem; display: inline-block; }
+        .cliente-card, .pagamento-card { background: #eef3fa; border: 1px solid #cde0ec; border-radius: 1.2rem; margin-bottom: 1.5rem; }
+        .app-footer { text-align: center; padding: 1rem 0.5rem; margin-top: 1.5rem; background: transparent; border-top: 1px solid #dce7ef; font-size: 0.9rem; color: #2c5a74; font-weight: 500; letter-spacing: 0.3px; }
+        .app-footer i { margin: 0 4px; color: #25D366; }
+        
+        /* Modais */
+        .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(15, 43, 61, 0.6); display: none; justify-content: center; align-items: center; z-index: 1000; padding: 1rem; backdrop-filter: blur(3px); }
+        .modal-content { background: white; width: 100%; max-width: 700px; border-radius: 1.5rem; padding: 2rem; max-height: 90vh; overflow-y: auto; box-shadow: 0 20px 40px rgba(0,0,0,0.2); }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 2px solid #e2edf2; padding-bottom: 1rem; }
+        .modal-header h2 { margin: 0; border: none; padding: 0; }
+        .modal-close { background: none; border: none; font-size: 1.8rem; cursor: pointer; color: #64748b; transition: 0.2s; }
+        .modal-close:hover { color: #e53e3e; }
+        .salvo-card { border: 1px solid #e2edf2; border-radius: 1rem; padding: 1.2rem; margin-bottom: 1rem; display: flex; justify-content: space-between; align-items: center; background: #f8fafc; flex-wrap: wrap; gap: 1rem; transition: 0.2s; }
+        .salvo-card:hover { border-color: #2c7da0; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .salvo-info strong { color: #0f2b3d; display: block; font-size: 1.1rem; margin-bottom: 0.3rem; }
+        .salvo-info span { color: #64748b; font-size: 0.9rem; display: block; }
+        .salvo-acoes { display: flex; gap: 0.5rem; }
+        .header-clientes-acoes { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        @media (max-width: 700px) {
+            body { padding: 1rem; }
+            .container { padding: 1rem; }
+            .header-empresa { margin: -1rem -1rem 1rem -1rem; flex-direction: column; align-items: center; text-align: center; }
+            .empresa-nome { font-size: 1.4rem; align-items: center; }
+            .action-bar { justify-content: center; }
+            .btn { padding: 0.5rem 1rem; font-size: 0.8rem; width: 100%; justify-content: center; }
+            .total-geral { font-size: 1.2rem; text-align: center; }
+            .salvo-card { flex-direction: column; align-items: flex-start; }
+            .salvo-acoes { width: 100%; }
+            .salvo-acoes .btn { flex: 1; }
+            .header-clientes-acoes .btn { width: auto; flex: 1; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="header-empresa">
+        <div class="empresa-nome">
+            <span>
+                <i class="fas fa-file-invoice-dollar"></i> <span id="displayEmpresaNome">Daniel Negrini</span>
+                <button class="btn-config" id="btnAbrirConfig" title="Configurar Empresa"><i class="fas fa-cog"></i></button>
+            </span>
+            <div class="empresa-detalhes" id="displayEmpresaCnpj">CNPJ: 13.898.487/0001-13</div>
+            <div class="empresa-detalhes" id="displayEmpresaEnd" style="font-size: 0.8rem;"></div>
+        </div>
+        <div class="empresa-contato"><i class="fab fa-whatsapp"></i> <span id="displayEmpresaTel">14 99692-2983</span></div>
+    </div>
+
+    <div class="form-card cliente-card">
+        <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
+            <h2 style="margin: 0; border-left-color: #2b8c5e;"><i class="fas fa-file-invoice"></i> Dados do Orçamento e Cliente</h2>
+            <div class="header-clientes-acoes">
+                <button class="btn btn-outline" id="btnSalvarClienteAba" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"><i class="fas fa-user-plus"></i> Salvar Cliente</button>
+                <button class="btn btn-primary" id="btnVerClientes" style="padding: 0.4rem 0.8rem; font-size: 0.8rem;"><i class="fas fa-users"></i> Clientes Salvos</button>
+            </div>
+        </div>
+        
+        <div class="form-row" style="margin-bottom: 1rem;">
+            <div class="input-group" style="max-width: 150px;">
+                <label><i class="fas fa-hashtag"></i> Número OS</label>
+                <input type="text" id="numeroOS" readonly title="A numeração da OS é gerada automaticamente">
+            </div>
+            <div class="input-group" style="max-width: 180px;">
+                <label><i class="fas fa-info-circle"></i> Status do Pedido</label>
+                <select id="statusOrcamento" onchange="atualizarCorStatus(this)">
+                    <option value="Orçamento">📝 Orçamento</option>
+                    <option value="Confirmado">✅ Confirmado</option>
+                </select>
+            </div>
+            
+            <div class="input-group" style="max-width: 220px;">
+                <label><i class="fas fa-cogs"></i> Andamento</label>
+                <select id="andamentoPedido" onchange="atualizarCorAndamento(this)">
+                    <option value="">(Opcional)</option>
+                    <option value="Produção">⚙️ Produção</option>
+                    <option value="Aguardando Retirada">📦 Aguardando Retirada</option>
+                    <option value="Entregue">🚚 Entregue</option>
+                </select>
+            </div>
+
+            <div class="input-group"><label><i class="fas fa-calendar-check"></i> Prazo de Entrega</label><input type="text" id="prazoEntrega" placeholder="Ex: 5 dias úteis" autocomplete="off"></div>
+        </div>
+
+        <div class="form-row">
+            <div class="input-group"><label><i class="fas fa-user-circle"></i> Nome do cliente</label><input type="text" id="clienteNome" placeholder="Ex: João Silva" autocomplete="off"></div>
+            <div class="input-group"><label><i class="fab fa-whatsapp"></i> Telefone / WhatsApp</label><input type="text" id="clienteTelefone" placeholder="(14) 99999-9999" autocomplete="off"></div>
+            <div class="input-group"><label><i class="fas fa-id-card"></i> CPF / CNPJ (Opcional)</label><input type="text" id="clienteCpfCnpj" placeholder="Ex: 000.000.000-00" autocomplete="off"></div>
+        </div>
+        <div style="font-size: 0.7rem; color: #2c5a74; margin-top: 0.5rem;"><i class="fas fa-info-circle"></i> Estes dados aparecerão no orçamento (PDF e WhatsApp).</div>
+    </div>
+
+    <div class="form-card pagamento-card">
+        <h2 style="margin-bottom: 0.5rem; border-left-color: #f59e0b;"><i class="fas fa-credit-card"></i> Forma de pagamento</h2>
+        <div class="form-row">
+            <div class="input-group"><label><i class="fas fa-hand-pointer"></i> Condição</label>
+                <select id="tipoPagamento">
+                    <option value="À vista (dinheiro/PIX)">💰 À vista (dinheiro/PIX)</option>
+                    <option value="Cartão de crédito (1x)">💳 Cartão de crédito (1x)</option>
+                    <option value="Cartão parcelado">📅 Cartão parcelado</option>
+                    <option value="PIX">⚡ PIX</option>
+                    <option value="Boleto bancário">📄 Boleto bancário</option>
+                    <option value="Depósito bancário">🏦 Depósito bancário</option>
+                    <option value="Outros">📝 Outros</option>
+                </select>
+            </div>
+            <div class="input-group"><label><i class="fas fa-pen-alt"></i> Detalhes (parcelas, desconto, etc.)</label><input type="text" id="detalhesPagamento" placeholder="Ex: 3x sem juros, 5% off à vista" autocomplete="off"></div>
+        </div>
+    </div>
+
+    <h2><i class="fas fa-cart-plus"></i> Adicionar / Editar produto</h2>
+    <div class="form-card">
+        <div class="form-row">
+            <div class="input-group"><label><i class="fas fa-tag"></i> Produto</label><input type="text" id="produtoNome" placeholder="Ex: Cadeira Gamer" autocomplete="off"></div>
+            <div class="input-group"><label><i class="fas fa-hashtag"></i> Quantidade</label><input type="number" id="produtoQtd" placeholder="1" step="1" min="1" value="1"></div>
+            <div class="input-group"><label><i class="fas fa-dollar-sign"></i> Valor unitário (R$)</label><input type="number" id="produtoPreco" placeholder="0,00" step="0.01" min="0" value="0"></div>
+            <div><button class="btn btn-primary" id="btnAdicionar"><i class="fas fa-plus-circle"></i> Adicionar</button><button class="btn btn-outline" id="btnCancelarEdicao" style="display: none;"><i class="fas fa-times"></i> Cancelar</button></div>
+        </div>
+        <div id="statusEdicao" class="badge-editing" style="display: none;"></div>
+    </div>
+
+    <h2><i class="fas fa-list-ul"></i> Itens do orçamento</h2>
+    <div class="table-wrapper"><table id="tabelaProdutos"><thead><tr><th>Produto</th><th>Qtd</th><th>Valor Unit.</th><th>Valor Total</th><th style="width: 80px;">Ações</th></tr></thead><tbody id="tbodyProdutos"><tr><td colspan="5" style="text-align:center;">Nenhum produto adicionado</td></tr></tbody></table></div>
+
+    <div class="total-geral" id="totalGeral">Total Geral: R$ 0,00</div>
+
+    <div class="action-bar">
+        <button class="btn btn-outline" id="btnFinanceiro" style="color: #2b8c5e; border-color: #2b8c5e;"><i class="fas fa-chart-line"></i> Relatório Financeiro</button>
+        <button class="btn btn-outline" id="btnVerSalvos"><i class="fas fa-folder-open"></i> Ver Orçamentos</button>
+        <button class="btn btn-primary" id="btnSalvarOrcamento"><i class="fas fa-save"></i> Salvar Orçamento</button>
+        <button class="btn btn-success" id="btnWhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
+        <button class="btn btn-primary" id="btnPDF"><i class="fas fa-file-pdf"></i> Gerar PDF</button>
+        <button class="btn btn-danger" id="btnLimpar"><i class="fas fa-plus"></i> Novo Orçamento</button>
+    </div>
+
+    <div class="app-footer"><i class="fas fa-building"></i> <span id="footerEmpresaNome">Daniel Negrini</span> &nbsp;|&nbsp;<i class="fab fa-whatsapp"></i> <span id="footerEmpresaTel">14 99692-2983</span> &nbsp;|&nbsp;<i class="far fa-edit"></i> Edite livremente</div>
+</div>
+
+<div id="modalConfigEmpresa" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-building" style="color: #2c7da0; margin-right: 10px;"></i> Dados da Empresa (Fornecedor)</h2>
+            <button class="modal-close" onclick="fecharModal('modalConfigEmpresa')"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="form-row" style="margin-bottom: 1rem;">
+            <div class="input-group"><label>Nome da Empresa</label><input type="text" id="cfgEmpresaNome" placeholder="Ex: Daniel Negrini"></div>
+            <div class="input-group"><label>CNPJ</label><input type="text" id="cfgEmpresaCnpj" placeholder="Ex: 13.898.487/0001-13"></div>
+        </div>
+        <div class="form-row" style="margin-bottom: 1rem;">
+            <div class="input-group"><label>Telefone / WhatsApp</label><input type="text" id="cfgEmpresaTel" placeholder="Ex: 14 99692-2983"></div>
+            <div class="input-group"><label>CEP</label><input type="text" id="cfgEmpresaCep" placeholder="Opcional"></div>
+        </div>
+        <div class="form-row" style="margin-bottom: 1.5rem;">
+            <div class="input-group" style="flex: 2;"><label>Endereço Completo</label><input type="text" id="cfgEmpresaEnd" placeholder="Rua, Número, Bairro"></div>
+            <div class="input-group"><label>Cidade / UF</label><input type="text" id="cfgEmpresaCid" placeholder="Ex: Bauru - SP"></div>
+        </div>
+        <div style="text-align: right;">
+            <button class="btn btn-primary" id="btnSalvarConfig"><i class="fas fa-save"></i> Salvar Configurações</button>
+        </div>
+    </div>
+</div>
+
+<div id="modalListaClientes" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-users" style="color: #2c7da0; margin-right: 10px;"></i> Clientes Salvos</h2>
+            <button class="modal-close" onclick="fecharModal('modalListaClientes')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="listaDeClientesHTML">
+            </div>
+    </div>
+</div>
+
+<div id="modalSalvos" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-folder-open" style="color: #2c7da0; margin-right: 10px;"></i> Orçamentos Salvos</h2>
+            <button class="modal-close" onclick="fecharModal('modalSalvos')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="listaSalvos">
+            </div>
+    </div>
+</div>
+
+<div id="modalFinanceiro" class="modal-overlay">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2><i class="fas fa-chart-bar" style="color: #2b8c5e; margin-right: 10px;"></i> Relatório de Vendas</h2>
+            <button class="modal-close" onclick="fecharModal('modalFinanceiro')"><i class="fas fa-times"></i></button>
+        </div>
+        <p style="margin-bottom: 1.5rem; color: #64748b; font-size: 0.9rem;">O sistema soma automaticamente os orçamentos <strong>Confirmados</strong>.</p>
+        
+        <div style="background: #f8fafc; padding: 1.2rem; border-radius: 1rem; border: 1px solid #e2edf2; margin-bottom: 1.5rem;">
+            <div class="form-row" style="align-items: flex-end;">
+                <div class="input-group">
+                    <label><i class="fas fa-filter"></i> Escolher Período</label>
+                    <select id="filtroPeriodoRelatorio" onchange="mudarFiltroRelatorio()">
+                        <option value="mes_atual">Mês Atual</option>
+                        <option value="ano_atual">Ano Atual</option>
+                        <option value="mes_especifico">Mês Específico</option>
+                        <option value="personalizado">Período Personalizado</option>
+                    </select>
+                </div>
+                
+                <div class="input-group" id="divFiltroMes" style="display: none;">
+                    <label>Selecione o Mês</label>
+                    <input type="month" id="filtroMesInput" onchange="atualizarDadosRelatorio()">
+                </div>
+                <div class="input-group" id="divFiltroDataIni" style="display: none;">
+                    <label>Data de Início</label>
+                    <input type="date" id="filtroDataIni" onchange="atualizarDadosRelatorio()">
+                </div>
+                <div class="input-group" id="divFiltroDataFim" style="display: none;">
+                    <label>Data de Fim</label>
+                    <input type="date" id="filtroDataFim" onchange="atualizarDadosRelatorio()">
+                </div>
+            </div>
+        </div>
+        
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem;">
+            <div style="flex: 1; background: #f0fdf4; border: 1px solid #bbf7d0; padding: 1.5rem; border-radius: 1rem; text-align: center; min-width: 200px;">
+                <div style="color: #166534; font-size: 0.9rem; font-weight: bold; margin-bottom: 0.5rem; text-transform: uppercase;">Faturamento (<span id="txtPeriodoSelecionado"></span>)</div>
+                <div id="valorPeriodoRelatorio" style="font-size: 2.2rem; font-weight: 800; color: #15803d;">R$ 0,00</div>
+                <div style="font-size: 0.85rem; color: #166534; margin-top: 5px;" id="qtdVendasPeriodo">0 vendas processadas</div>
+            </div>
+        </div>
+
+        <div style="text-align: right; border-top: 1px solid #e2edf2; padding-top: 1.5rem;">
+            <button class="btn btn-primary" onclick="gerarRelatorioPDF()"><i class="fas fa-file-pdf"></i> Emitir Relatório em PDF</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let produtos = [];
+    let editingIndex = null;
+    
+    // Bancos de Dados LocalStorage
+    let orcamentosSalvos = JSON.parse(localStorage.getItem('orcamentos_salvos_lista')) || [];
+    let currentOrcamentoId = localStorage.getItem('orcamento_current_id') || null;
+    let clientesDB = JSON.parse(localStorage.getItem('clientes_db_lista')) || [];
+    let empresaConfig = JSON.parse(localStorage.getItem('empresa_config')) || {
+        nome: "Daniel Negrini",
+        cnpj: "13.898.487/0001-13",
+        telefone: "14 99692-2983",
+        cep: "",
+        endereco: "",
+        cidade: ""
+    };
+    
+    // Variáveis Globais de Relatório
+    let relatorioAtualFiltrado = [];
+    let relatorioTxtPeriodo = "";
+
+    const inputNome = document.getElementById('produtoNome');
+    const inputQtd = document.getElementById('produtoQtd');
+    const inputPreco = document.getElementById('produtoPreco');
+    const btnAdicionar = document.getElementById('btnAdicionar');
+    const btnCancelarEdicao = document.getElementById('btnCancelarEdicao');
+    const statusEdicaoDiv = document.getElementById('statusEdicao');
+    const tbody = document.getElementById('tbodyProdutos');
+    const totalGeralSpan = document.getElementById('totalGeral');
+    
+    const clienteNomeInput = document.getElementById('clienteNome');
+    const clienteTelefoneInput = document.getElementById('clienteTelefone');
+    const clienteCpfCnpjInput = document.getElementById('clienteCpfCnpj');
+    
+    const numeroOSInput = document.getElementById('numeroOS');
+    const statusOrcamentoSelect = document.getElementById('statusOrcamento');
+    const andamentoPedidoSelect = document.getElementById('andamentoPedido'); // NOVO
+    const prazoEntregaInput = document.getElementById('prazoEntrega');
+    const tipoPagamentoSelect = document.getElementById('tipoPagamento');
+    const detalhesPagamentoInput = document.getElementById('detalhesPagamento');
+
+    /* --- CONTROLE DE COR DO STATUS E ANDAMENTO --- */
+    function atualizarCorStatus(selectObj) {
+        if(selectObj.value === 'Confirmado') {
+            selectObj.style.color = '#166534';
+            selectObj.style.backgroundColor = '#dcfce7';
+        } else {
+            selectObj.style.color = '#1f6392';
+            selectObj.style.backgroundColor = '#fff';
+        }
+    }
+
+    function atualizarCorAndamento(selectObj) {
+        if(selectObj.value === 'Produção') {
+            selectObj.style.color = '#d97706';
+            selectObj.style.backgroundColor = '#fef3c7';
+        } else if(selectObj.value === 'Aguardando Retirada') {
+            selectObj.style.color = '#2563eb';
+            selectObj.style.backgroundColor = '#dbeafe';
+        } else if(selectObj.value === 'Entregue') {
+            selectObj.style.color = '#059669';
+            selectObj.style.backgroundColor = '#d1fae5';
+        } else {
+            selectObj.style.color = '#1f6392';
+            selectObj.style.backgroundColor = '#fff';
+        }
+    }
+
+    /* --- CONFIGURAÇÃO DA EMPRESA --- */
+    function atualizarUIEmpresa() {
+        document.getElementById('displayEmpresaNome').textContent = empresaConfig.nome;
+        document.getElementById('displayEmpresaCnpj').textContent = empresaConfig.cnpj ? `CNPJ: ${empresaConfig.cnpj}` : '';
+        document.getElementById('displayEmpresaTel').textContent = empresaConfig.telefone;
+        document.getElementById('footerEmpresaNome').textContent = empresaConfig.nome;
+        document.getElementById('footerEmpresaTel').textContent = empresaConfig.telefone;
+        
+        let linhaEnd = "";
+        if (empresaConfig.endereco) linhaEnd += empresaConfig.endereco;
+        if (empresaConfig.cidade) linhaEnd += (linhaEnd ? " - " : "") + empresaConfig.cidade;
+        document.getElementById('displayEmpresaEnd').textContent = linhaEnd;
+    }
+
+    function abrirConfigEmpresa() {
+        document.getElementById('cfgEmpresaNome').value = empresaConfig.nome || '';
+        document.getElementById('cfgEmpresaCnpj').value = empresaConfig.cnpj || '';
+        document.getElementById('cfgEmpresaTel').value = empresaConfig.telefone || '';
+        document.getElementById('cfgEmpresaCep').value = empresaConfig.cep || '';
+        document.getElementById('cfgEmpresaEnd').value = empresaConfig.endereco || '';
+        document.getElementById('cfgEmpresaCid').value = empresaConfig.cidade || '';
+        document.getElementById('modalConfigEmpresa').style.display = 'flex';
+    }
+
+    function salvarConfigEmpresa() {
+        empresaConfig = {
+            nome: document.getElementById('cfgEmpresaNome').value.trim(),
+            cnpj: document.getElementById('cfgEmpresaCnpj').value.trim(),
+            telefone: document.getElementById('cfgEmpresaTel').value.trim(),
+            cep: document.getElementById('cfgEmpresaCep').value.trim(),
+            endereco: document.getElementById('cfgEmpresaEnd').value.trim(),
+            cidade: document.getElementById('cfgEmpresaCid').value.trim()
+        };
+        if(!empresaConfig.nome) empresaConfig.nome = "Nome da Empresa";
+        localStorage.setItem('empresa_config', JSON.stringify(empresaConfig));
+        atualizarUIEmpresa();
+        fecharModal('modalConfigEmpresa');
+    }
+
+    /* --- BANCO DE DADOS DE CLIENTES --- */
+    function salvarClienteDB() {
+        const nome = clienteNomeInput.value.trim();
+        const telefone = clienteTelefoneInput.value.trim();
+        const cpf = clienteCpfCnpjInput.value.trim(); 
+        
+        if (!nome) { alert("Digite ao menos o nome do cliente para salvar."); return; }
+        
+        const index = clientesDB.findIndex(c => c.nome.toLowerCase() === nome.toLowerCase());
+        if (index >= 0) {
+            clientesDB[index].telefone = telefone;
+            clientesDB[index].cpf = cpf; 
+        } else {
+            clientesDB.push({ id: Date.now().toString(), nome, telefone, cpf });
+        }
+        
+        localStorage.setItem('clientes_db_lista', JSON.stringify(clientesDB));
+        alert("👤 Cliente salvo no banco de dados!");
+    }
+
+    function abrirModalClientes() {
+        const divLista = document.getElementById('listaDeClientesHTML');
+        divLista.innerHTML = '';
+        
+        if (clientesDB.length === 0) {
+            divLista.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">Nenhum cliente cadastrado.</p>';
+        } else {
+            const ordenados = [...clientesDB].sort((a, b) => a.nome.localeCompare(b.nome));
+            ordenados.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'salvo-card';
+                const infoExtra = c.cpf ? ` | CPF/CNPJ: ${c.cpf}` : '';
+                card.innerHTML = `
+                    <div class="salvo-info">
+                        <strong>${c.nome}</strong>
+                        <span>${c.telefone || 'Sem telefone cadastrado'} ${infoExtra}</span>
+                    </div>
+                    <div class="salvo-acoes">
+                        <button class="btn btn-primary" onclick="usarCliente('${c.id}')"><i class="fas fa-check"></i> Usar</button>
+                        <button class="btn btn-outline" style="color: #e53e3e; border-color: #e53e3e;" onclick="excluirCliente('${c.id}')"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                divLista.appendChild(card);
+            });
+        }
+        document.getElementById('modalListaClientes').style.display = 'flex';
+    }
+
+    window.usarCliente = function(id) {
+        const c = clientesDB.find(x => x.id === id);
+        if (c) {
+            clienteNomeInput.value = c.nome;
+            clienteTelefoneInput.value = c.telefone;
+            clienteCpfCnpjInput.value = c.cpf || ''; 
+            salvarClienteDraft();
+        }
+        fecharModal('modalListaClientes');
+    };
+
+    window.excluirCliente = function(id) {
+        if(confirm("Excluir este cliente do banco de dados?")) {
+            clientesDB = clientesDB.filter(x => x.id !== id);
+            localStorage.setItem('clientes_db_lista', JSON.stringify(clientesDB));
+            abrirModalClientes();
+        }
+    };
+
+    /* --- SISTEMA DE RELATÓRIO FINANCEIRO --- */
+    function mudarFiltroRelatorio() {
+        const filtro = document.getElementById('filtroPeriodoRelatorio').value;
+        document.getElementById('divFiltroMes').style.display = filtro === 'mes_especifico' ? 'block' : 'none';
+        document.getElementById('divFiltroDataIni').style.display = filtro === 'personalizado' ? 'block' : 'none';
+        document.getElementById('divFiltroDataFim').style.display = filtro === 'personalizado' ? 'block' : 'none';
+        atualizarDadosRelatorio();
+    }
+
+    function atualizarDadosRelatorio() {
+        const filtro = document.getElementById('filtroPeriodoRelatorio').value;
+        const hoje = new Date();
+        let dadosFiltrados = [];
+        let total = 0;
+        let textoPeriodo = "";
+
+        const confirmados = orcamentosSalvos.filter(o => o.status === "Confirmado");
+
+        if (filtro === 'mes_atual') {
+            const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            textoPeriodo = nomesMeses[hoje.getMonth()] + " de " + hoje.getFullYear();
+            dadosFiltrados = confirmados.filter(o => {
+                const d = new Date(o.dataHora);
+                return d.getMonth() === hoje.getMonth() && d.getFullYear() === hoje.getFullYear();
+            });
+        } 
+        else if (filtro === 'ano_atual') {
+            textoPeriodo = "Ano de " + hoje.getFullYear();
+            dadosFiltrados = confirmados.filter(o => new Date(o.dataHora).getFullYear() === hoje.getFullYear());
+        } 
+        else if (filtro === 'mes_especifico') {
+            const mesVal = document.getElementById('filtroMesInput').value; 
+            if (mesVal) {
+                const [ano, mes] = mesVal.split('-');
+                textoPeriodo = `${mes}/${ano}`;
+                dadosFiltrados = confirmados.filter(o => {
+                    const d = new Date(o.dataHora);
+                    return d.getFullYear() === parseInt(ano) && d.getMonth() === (parseInt(mes) - 1);
+                });
+            } else {
+                textoPeriodo = "Mês não selecionado";
+            }
+        } 
+        else if (filtro === 'personalizado') {
+            const dataIni = document.getElementById('filtroDataIni').value;
+            const dataFim = document.getElementById('filtroDataFim').value;
+            
+            if (dataIni && dataFim) {
+                const dIni = new Date(dataIni + "T00:00:00");
+                const dFim = new Date(dataFim + "T23:59:59");
+                textoPeriodo = `${dIni.toLocaleDateString('pt-BR')} até ${dFim.toLocaleDateString('pt-BR')}`;
+                dadosFiltrados = confirmados.filter(o => {
+                    const d = new Date(o.dataHora);
+                    return d >= dIni && d <= dFim;
+                });
+            } else {
+                textoPeriodo = "Período Inválido";
+            }
+        }
+
+        dadosFiltrados.forEach(o => total += o.total);
+        
+        relatorioAtualFiltrado = dadosFiltrados;
+        relatorioTxtPeriodo = textoPeriodo;
+
+        document.getElementById('txtPeriodoSelecionado').textContent = textoPeriodo;
+        document.getElementById('valorPeriodoRelatorio').textContent = formatarMoeda(total);
+        document.getElementById('qtdVendasPeriodo').textContent = `${dadosFiltrados.length} Venda(s) Registrada(s)`;
+    }
+
+    function abrirModalFinanceiro() {
+        document.getElementById('filtroPeriodoRelatorio').value = 'mes_atual';
+        
+        const hoje = new Date();
+        const mesAtualStr = hoje.getFullYear() + "-" + String(hoje.getMonth() + 1).padStart(2, '0');
+        document.getElementById('filtroMesInput').value = mesAtualStr;
+        
+        mudarFiltroRelatorio(); 
+        document.getElementById('modalFinanceiro').style.display = 'flex';
+    }
+
+    function gerarRelatorioPDF() {
+        if (relatorioAtualFiltrado.length === 0) {
+            alert("Não há vendas confirmadas neste período para gerar o relatório.");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        
+        const pageWidth = doc.internal.pageSize.getWidth(); 
+        const pageHeight = doc.internal.pageSize.getHeight();
+        const marginLeft = 15; const marginRight = 15; let y = 20;
+        
+        const primaryColor = [15, 43, 61]; 
+        const textColor = [51, 65, 85]; 
+
+        doc.setFontSize(22); doc.setFont("helvetica", "bold"); doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text(empresaConfig.nome, marginLeft, y);
+        doc.setFontSize(14); doc.setFont("helvetica", "normal"); doc.setTextColor(44, 125, 160);
+        doc.text("RELATÓRIO DE VENDAS", pageWidth - marginRight, y, { align: 'right' });
+        
+        y += 8;
+        doc.setFontSize(10); doc.setTextColor(100, 100, 100);
+        doc.text(`Período de Referência: ${relatorioTxtPeriodo}`, marginLeft, y);
+        doc.text(`Gerado em: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth - marginRight, y, { align: 'right' });
+        
+        y += 8;
+        doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.5); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10;
+
+        const filtro = document.getElementById('filtroPeriodoRelatorio').value;
+        let tableHead = [];
+        let tableBody = [];
+        let somaTotal = 0;
+        let colStyles = {};
+
+        if (filtro === 'ano_atual' || filtro === 'personalizado') {
+            tableHead = [['Mês / Ano', 'Qtd. de Vendas', 'Valor Mensal']];
+            const resumoMensal = {};
+            const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+
+            relatorioAtualFiltrado.forEach(o => {
+                somaTotal += o.total;
+                const d = new Date(o.dataHora);
+                const key = `${d.getFullYear()}-${String(d.getMonth()).padStart(2, '0')}`;
+                const label = `${nomesMeses[d.getMonth()]} / ${d.getFullYear()}`;
+
+                if (!resumoMensal[key]) {
+                    resumoMensal[key] = { label: label, qtd: 0, valor: 0 };
+                }
+                resumoMensal[key].qtd += 1;
+                resumoMensal[key].valor += o.total;
+            });
+
+            const sortedKeys = Object.keys(resumoMensal).sort();
+            sortedKeys.forEach(k => {
+                const item = resumoMensal[k];
+                tableBody.push([
+                    item.label,
+                    item.qtd.toString(),
+                    formatarMoeda(item.valor)
+                ]);
+            });
+            colStyles = { 1: { halign: 'center' }, 2: { halign: 'right', fontStyle: 'bold', textColor: [21, 128, 61] } };
+        
+        } else {
+            tableHead = [['Nº OS', 'Data', 'Cliente', 'Forma Pagamento', 'Valor Total']];
+            tableBody = relatorioAtualFiltrado.map(o => {
+                somaTotal += o.total;
+                return [
+                    o.os.padStart(3, '0'),
+                    new Date(o.dataHora).toLocaleDateString('pt-BR'),
+                    o.clienteNome || 'Não informado',
+                    o.tipoPagamento || '-',
+                    formatarMoeda(o.total)
+                ];
+            });
+            colStyles = { 4: { halign: 'right', fontStyle: 'bold', textColor: [21, 128, 61] } };
+        }
+
+        doc.autoTable({
+            startY: y, 
+            head: tableHead, 
+            body: tableBody, 
+            theme: 'striped',
+            headStyles: { fillColor: primaryColor, textColor: [255, 255, 255], fontStyle: 'bold' },
+            bodyStyles: { textColor: textColor, fontSize: 9 },
+            columnStyles: colStyles,
+            margin: { left: marginLeft, right: marginRight }
+        });
+
+        let finalY = doc.lastAutoTable.finalY + 15; 
+        
+        doc.setFillColor(241, 245, 249); doc.roundedRect(pageWidth - marginRight - 80, finalY - 8, 80, 20, 2, 2, 'F');
+        doc.setFontSize(12); doc.setFont("helvetica", "normal"); doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        
+        let textoTotal = (filtro === 'ano_atual') ? "TOTAL DO ANO:" : "TOTAL DO PERÍODO:";
+        doc.text(textoTotal, pageWidth - marginRight - 75, finalY);
+        
+        doc.setFontSize(14); doc.setFont("helvetica", "bold");
+        doc.text(formatarMoeda(somaTotal), pageWidth - marginRight - 5, finalY + 7, { align: 'right' });
+
+        doc.save(`Relatorio_Vendas_${new Date().getTime()}.pdf`);
+        alert("✅ Relatório Financeiro PDF gerado com sucesso!");
+    }
+
+    /* --- CONTROLES GERAIS E DRAFT --- */
+    function fecharModal(idModal) { document.getElementById(idModal).style.display = 'none'; }
+    
+    function salvarClienteDraft() { 
+        localStorage.setItem('orcamento_cliente_nome', clienteNomeInput.value); 
+        localStorage.setItem('orcamento_cliente_telefone', clienteTelefoneInput.value); 
+        localStorage.setItem('orcamento_cliente_cpf', clienteCpfCnpjInput.value); 
+    }
+    
+    function salvarDadosOrcamentoDraft() { 
+        localStorage.setItem('orcamento_prazo', prazoEntregaInput.value); 
+        localStorage.setItem('orcamento_status_draft', statusOrcamentoSelect.value); 
+        localStorage.setItem('orcamento_andamento_draft', andamentoPedidoSelect.value); // NOVO
+    }
+    function salvarPagamentoDraft() { localStorage.setItem('orcamento_tipo_pagamento', tipoPagamentoSelect.value); localStorage.setItem('orcamento_detalhes_pagamento', detalhesPagamentoInput.value); }
+    function salvarProdutosDraft() { localStorage.setItem('orcamento_produtos_draft', JSON.stringify(produtos)); }
+    
+    clienteNomeInput.addEventListener('input', salvarClienteDraft);
+    clienteTelefoneInput.addEventListener('input', salvarClienteDraft);
+    clienteCpfCnpjInput.addEventListener('input', salvarClienteDraft);
+    prazoEntregaInput.addEventListener('input', salvarDadosOrcamentoDraft);
+    statusOrcamentoSelect.addEventListener('change', salvarDadosOrcamentoDraft);
+    andamentoPedidoSelect.addEventListener('change', salvarDadosOrcamentoDraft); // NOVO
+    tipoPagamentoSelect.addEventListener('change', salvarPagamentoDraft);
+    detalhesPagamentoInput.addEventListener('input', salvarPagamentoDraft);
+
+    function getNextAvailableOS() {
+        if (orcamentosSalvos.length === 0) return "1";
+        let maxOS = 0;
+        orcamentosSalvos.forEach(o => { let num = parseInt(o.os); if (num > maxOS) maxOS = num; });
+        return (maxOS + 1).toString();
+    }
+
+    function carregarDadosSalvos() {
+        atualizarUIEmpresa();
+        
+        const nomeSalvo = localStorage.getItem('orcamento_cliente_nome');
+        const telefoneSalvo = localStorage.getItem('orcamento_cliente_telefone');
+        const cpfSalvo = localStorage.getItem('orcamento_cliente_cpf'); 
+        
+        if (nomeSalvo) clienteNomeInput.value = nomeSalvo;
+        if (telefoneSalvo) clienteTelefoneInput.value = telefoneSalvo;
+        if (cpfSalvo) clienteCpfCnpjInput.value = cpfSalvo; 
+        
+        const prazoSalvo = localStorage.getItem('orcamento_prazo');
+        if (prazoSalvo) prazoEntregaInput.value = prazoSalvo;
+        
+        const statusSalvo = localStorage.getItem('orcamento_status_draft');
+        if (statusSalvo) { statusOrcamentoSelect.value = statusSalvo; atualizarCorStatus(statusOrcamentoSelect); }
+        
+        const andamentoSalvo = localStorage.getItem('orcamento_andamento_draft');
+        if (andamentoSalvo) { andamentoPedidoSelect.value = andamentoSalvo; atualizarCorAndamento(andamentoPedidoSelect); }
+
+        const tipoPagSalvo = localStorage.getItem('orcamento_tipo_pagamento');
+        const detalhesPagSalvo = localStorage.getItem('orcamento_detalhes_pagamento');
+        if (tipoPagSalvo) tipoPagamentoSelect.value = tipoPagSalvo;
+        if (detalhesPagSalvo !== null) detalhesPagamentoInput.value = detalhesPagSalvo;
+
+        currentOrcamentoId = localStorage.getItem('orcamento_current_id');
+        const osDraft = localStorage.getItem('orcamento_os_draft');
+        
+        if (currentOrcamentoId && osDraft) { numeroOSInput.value = osDraft; } 
+        else { numeroOSInput.value = getNextAvailableOS(); localStorage.setItem('orcamento_os_draft', numeroOSInput.value); }
+
+        const prods = localStorage.getItem('orcamento_produtos_draft');
+        if (prods) { produtos = JSON.parse(prods); } 
+        else { adicionarExemploInicial(); }
+    }
+
+    function formatarMoeda(valor) { return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }); }
+    function calcularTotalGeral() { return produtos.reduce((acc, p) => acc + (p.quantidade * p.precoUnitario), 0); }
+    function atualizarTotalGeralUI() { totalGeralSpan.innerHTML = `Total Geral: ${formatarMoeda(calcularTotalGeral())}`; }
+
+    function renderizarTabela() {
+        tbody.innerHTML = '';
+        if (produtos.length === 0) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Nenhum produto adicionado</td></tr>'; atualizarTotalGeralUI(); return; }
+        for (let i = 0; i < produtos.length; i++) {
+            const p = produtos[i];
+            const totalLinha = p.quantidade * p.precoUnitario;
+            const row = tbody.insertRow();
+            row.insertCell(0).textContent = p.nome;
+            row.insertCell(1).textContent = p.quantidade;
+            row.insertCell(2).textContent = formatarMoeda(p.precoUnitario);
+            row.insertCell(3).textContent = formatarMoeda(totalLinha);
+            const cellAcoes = row.insertCell(4);
+            cellAcoes.className = 'acoes';
+            const editIcon = document.createElement('i');
+            editIcon.className = 'fas fa-edit'; editIcon.style.cursor = 'pointer'; editIcon.style.marginRight = '12px';
+            editIcon.addEventListener('click', (idx => () => iniciarEdicao(idx))(i));
+            const delIcon = document.createElement('i');
+            delIcon.className = 'fas fa-trash-alt'; delIcon.style.cursor = 'pointer';
+            delIcon.addEventListener('click', (idx => () => removerProduto(idx))(i));
+            cellAcoes.appendChild(editIcon); cellAcoes.appendChild(delIcon);
+        }
+        atualizarTotalGeralUI();
+        salvarProdutosDraft();
+    }
+
+    function removerProduto(index) { if (editingIndex !== null) cancelarEdicao(); produtos.splice(index, 1); renderizarTabela(); }
+    function iniciarEdicao(index) {
+        if (editingIndex !== null && editingIndex !== index) cancelarEdicao();
+        const produto = produtos[index];
+        inputNome.value = produto.nome; inputQtd.value = produto.quantidade; inputPreco.value = produto.precoUnitario;
+        editingIndex = index;
+        btnAdicionar.innerHTML = '<i class="fas fa-sync-alt"></i> Atualizar Produto';
+        btnCancelarEdicao.style.display = 'inline-flex'; statusEdicaoDiv.style.display = 'block';
+        statusEdicaoDiv.innerHTML = `<i class="fas fa-pen"></i> Editando: "${produto.nome}" - Clique em "Atualizar" ou "Cancelar"`;
+    }
+    function cancelarEdicao() {
+        editingIndex = null; btnAdicionar.innerHTML = '<i class="fas fa-plus-circle"></i> Adicionar';
+        btnCancelarEdicao.style.display = 'none'; statusEdicaoDiv.style.display = 'none'; statusEdicaoDiv.innerHTML = '';
+        inputNome.value = ''; inputQtd.value = '1'; inputPreco.value = ''; inputNome.focus();
+    }
+    function adicionarOuAtualizarProduto() {
+        let nome = inputNome.value.trim(); let quantidade = parseFloat(inputQtd.value); let precoUnitario = parseFloat(inputPreco.value);
+        if (nome === "") { alert("Informe o nome do produto."); return; }
+        if (isNaN(quantidade) || quantidade <= 0) { alert("Quantidade deve ser maior que 0."); return; }
+        if (isNaN(precoUnitario) || precoUnitario < 0) { alert("Valor unitário inválido."); return; }
+        precoUnitario = Math.round(precoUnitario * 100) / 100; quantidade = Math.floor(quantidade);
+        if (editingIndex !== null) { produtos[editingIndex] = { nome, quantidade, precoUnitario }; cancelarEdicao(); renderizarTabela(); } 
+        else { produtos.push({ nome, quantidade, precoUnitario }); inputNome.value = ''; inputQtd.value = '1'; inputPreco.value = ''; inputNome.focus(); renderizarTabela(); }
+    }
+
+    function getDadosCliente() { 
+        let nome = clienteNomeInput.value.trim(); 
+        let telefone = clienteTelefoneInput.value.trim(); 
+        let cpf = clienteCpfCnpjInput.value.trim();
+        return { nome: nome || "Não informado", telefone: telefone || "Não informado", cpf: cpf }; 
+    }
+    
+    function getFormaPagamentoFormatada() { let tipo = tipoPagamentoSelect.options[tipoPagamentoSelect.selectedIndex]?.text || tipoPagamentoSelect.value; let detalhes = detalhesPagamentoInput.value.trim(); return detalhes ? `${tipo} (${detalhes})` : tipo; }
+
+    /* --- ORÇAMENTOS SALVOS --- */
+    function salvarOrcamentoPermanente() {
+        if (produtos.length === 0) { alert("Adicione produtos antes de salvar o orçamento."); return; }
+        let isNew = !currentOrcamentoId;
+        if (isNew) { currentOrcamentoId = "ORC_" + Date.now(); localStorage.setItem('orcamento_current_id', currentOrcamentoId); }
+
+        const orcamentoObj = {
+            id: currentOrcamentoId, os: numeroOSInput.value, dataHora: new Date().toISOString(),
+            status: statusOrcamentoSelect.value, 
+            andamento: andamentoPedidoSelect.value, // NOVO
+            excluido: false,
+            clienteNome: clienteNomeInput.value, clienteTelefone: clienteTelefoneInput.value, clienteCpf: clienteCpfCnpjInput.value, 
+            prazo: prazoEntregaInput.value, tipoPagamento: tipoPagamentoSelect.value,
+            detalhesPagamento: detalhesPagamentoInput.value, produtos: JSON.parse(JSON.stringify(produtos)), total: calcularTotalGeral()
+        };
+
+        const index = orcamentosSalvos.findIndex(o => o.id === currentOrcamentoId);
+        if (index >= 0) { orcamentosSalvos[index] = orcamentoObj; } else { orcamentosSalvos.push(orcamentoObj); }
+
+        localStorage.setItem('orcamentos_salvos_lista', JSON.stringify(orcamentosSalvos));
+        alert(`✅ OS Nº ${orcamentoObj.os} salva com sucesso!`);
+    }
+
+    function abrirModalSalvos() {
+        const divLista = document.getElementById('listaSalvos');
+        divLista.innerHTML = '';
+        
+        let orcamentosVisiveis = orcamentosSalvos.filter(o => !o.excluido);
+        
+        if (orcamentosVisiveis.length === 0) {
+            divLista.innerHTML = '<p style="text-align: center; color: #64748b; padding: 2rem;">Você ainda não possui orçamentos salvos.</p>';
+        } else {
+            let ordenados = [...orcamentosVisiveis].sort((a, b) => parseInt(b.os) - parseInt(a.os));
+            ordenados.forEach(o => {
+                const dataFormatada = new Date(o.dataHora).toLocaleDateString('pt-BR');
+                const card = document.createElement('div'); card.className = 'salvo-card';
+                
+                const isCurrent = (o.id === currentOrcamentoId) ? '<span style="color:#2b8c5e; font-weight:bold; font-size: 0.8rem; margin-left: 10px;"><i class="fas fa-arrow-right"></i> ABERTO</span>' : '';
+                const badgeStatus = (o.status === "Confirmado") 
+                    ? '<span style="background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 10px;">✅ Confirmado</span>' 
+                    : '<span style="background: #f1f5f9; color: #475569; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 10px;">📝 Orçamento</span>';
+
+                // NOVO: Badge do andamento
+                let badgeAndamento = '';
+                if(o.andamento === 'Produção') {
+                    badgeAndamento = '<span style="background: #fef3c7; color: #d97706; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 5px;">⚙️ Produção</span>';
+                } else if(o.andamento === 'Aguardando Retirada') {
+                    badgeAndamento = '<span style="background: #dbeafe; color: #2563eb; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 5px;">📦 Ag. Retirada</span>';
+                } else if(o.andamento === 'Entregue') {
+                    badgeAndamento = '<span style="background: #d1fae5; color: #059669; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 5px;">🚚 Entregue</span>';
+                }
+
+                card.innerHTML = `
+                    <div class="salvo-info">
+                        <strong>OS Nº ${o.os.padStart(3, '0')} - ${o.clienteNome || 'Cliente não informado'} ${badgeStatus} ${badgeAndamento} ${isCurrent}</strong>
+                        <span>Data: ${dataFormatada} &nbsp;|&nbsp; Prazo: ${o.prazo || '-'} &nbsp;|&nbsp; Total: ${formatarMoeda(o.total)}</span>
+                        <span>Qtd Itens: ${o.produtos.length}</span>
+                    </div>
+                    <div class="salvo-acoes">
+                        <button class="btn btn-primary" onclick="carregarOrcamentoSalvo('${o.id}')"><i class="fas fa-folder-open"></i> Abrir</button>
+                        <button class="btn btn-danger" onclick="excluirOrcamentoSalvo('${o.id}')"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                `;
+                divLista.appendChild(card);
+            });
+        }
+        document.getElementById('modalSalvos').style.display = 'flex';
+    }
+
+    window.carregarOrcamentoSalvo = function(id) {
+        const orcamento = orcamentosSalvos.find(o => o.id === id);
+        if (!orcamento) return;
+        currentOrcamentoId = orcamento.id; localStorage.setItem('orcamento_current_id', currentOrcamentoId);
+        numeroOSInput.value = orcamento.os; localStorage.setItem('orcamento_os_draft', orcamento.os);
+        
+        statusOrcamentoSelect.value = orcamento.status || "Orçamento"; 
+        atualizarCorStatus(statusOrcamentoSelect);
+        
+        andamentoPedidoSelect.value = orcamento.andamento || "";
+        atualizarCorAndamento(andamentoPedidoSelect);
+        
+        clienteNomeInput.value = orcamento.clienteNome; 
+        clienteTelefoneInput.value = orcamento.clienteTelefone;
+        clienteCpfCnpjInput.value = orcamento.clienteCpf || ''; 
+        
+        prazoEntregaInput.value = orcamento.prazo; tipoPagamentoSelect.value = orcamento.tipoPagamento; detalhesPagamentoInput.value = orcamento.detalhesPagamento;
+        produtos = JSON.parse(JSON.stringify(orcamento.produtos));
+        salvarClienteDraft(); salvarDadosOrcamentoDraft(); salvarPagamentoDraft(); salvarProdutosDraft();
+        renderizarTabela(); fecharModal('modalSalvos');
+    };
+
+    window.excluirOrcamentoSalvo = function(id) {
+        if (confirm('Tem certeza que deseja excluir este orçamento da lista? (Se estiver "Confirmado", o valor continuará salvo no Financeiro)')) {
+            const index = orcamentosSalvos.findIndex(o => o.id === id);
+            if (index > -1) {
+                orcamentosSalvos[index].excluido = true; 
+            }
+            localStorage.setItem('orcamentos_salvos_lista', JSON.stringify(orcamentosSalvos));
+            if (currentOrcamentoId === id) { currentOrcamentoId = null; localStorage.removeItem('orcamento_current_id'); }
+            abrirModalSalvos();
+        }
+    };
+
+    function iniciarNovoOrcamento() { 
+        if (confirm("Iniciar um novo orçamento? Limpará a tela e preparará a próxima OS.")) { 
+            produtos = []; if (editingIndex !== null) cancelarEdicao(); 
+            currentOrcamentoId = null; localStorage.removeItem('orcamento_current_id');
+            clienteNomeInput.value = ''; clienteTelefoneInput.value = ''; clienteCpfCnpjInput.value = ''; prazoEntregaInput.value = ''; detalhesPagamentoInput.value = '';
+            
+            statusOrcamentoSelect.value = "Orçamento"; atualizarCorStatus(statusOrcamentoSelect);
+            andamentoPedidoSelect.value = ""; atualizarCorAndamento(andamentoPedidoSelect);
+            
+            numeroOSInput.value = getNextAvailableOS(); localStorage.setItem('orcamento_os_draft', numeroOSInput.value);
+            salvarClienteDraft(); salvarDadosOrcamentoDraft(); salvarPagamentoDraft(); salvarProdutosDraft();
+            renderizarTabela(); 
+        } 
+    }
+
+    /* --- PDF DE ORÇAMENTO E WHATSAPP --- */
+    async function gerarPDF() {
+        if (produtos.length === 0) { alert("Adicione pelo menos um produto antes de gerar o PDF."); return; }
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' });
+        
+        const pageWidth = doc.internal.pageSize.getWidth(); const pageHeight = doc.internal.pageSize.getHeight();
+        const marginLeft = 20; const marginRight = 20; let y = 0;
+        const primaryColor = [15, 43, 61]; const secondaryColor = [44, 125, 160]; const textColor = [51, 65, 85]; const lightBg = [241, 245, 249];       
+
+        doc.setFillColor(primaryColor[0], primaryColor[1], primaryColor[2]); doc.rect(0, 0, pageWidth, 8, 'F'); y = 25;
+
+        // Dados Fornecedor
+        doc.setFontSize(24); doc.setFont("helvetica", "bold"); doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text(empresaConfig.nome, marginLeft, y);
+        doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 100, 100);
+        if(empresaConfig.cnpj) { doc.text(`CNPJ: ${empresaConfig.cnpj}`, marginLeft, y + 6); }
+        let linhaEndPdf = "";
+        if(empresaConfig.endereco) linhaEndPdf += empresaConfig.endereco;
+        if(empresaConfig.cidade) linhaEndPdf += (linhaEndPdf ? " - " : "") + empresaConfig.cidade;
+        if(empresaConfig.cep) linhaEndPdf += (linhaEndPdf ? " | CEP: " : "") + empresaConfig.cep;
+        if(linhaEndPdf) { doc.text(linhaEndPdf, marginLeft, y + 11); }
+        doc.text(`WhatsApp: ${empresaConfig.telefone}`, marginLeft, y + (linhaEndPdf ? 16 : 11));
+
+        // Cabeçalho Direito
+        doc.setFontSize(14); doc.setFont("helvetica", "bold"); doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
+        const numOS = numeroOSInput.value ? numeroOSInput.value.padStart(3, '0') : '001';
+        doc.text(`ORÇAMENTO Nº ${numOS}`, pageWidth - marginRight, y, { align: 'right' });
+        doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(100, 100, 100);
+        doc.text(`Emitido em: ${new Date().toLocaleDateString('pt-BR')}`, pageWidth - marginRight, y + 6, { align: 'right' });
+        const prazoText = prazoEntregaInput.value ? prazoEntregaInput.value : 'A combinar';
+        doc.text(`Prazo: ${prazoText}`, pageWidth - marginRight, y + 11, { align: 'right' });
+
+        y += (linhaEndPdf ? 26 : 21);
+        doc.setDrawColor(226, 232, 240); doc.setLineWidth(0.5); doc.line(marginLeft, y, pageWidth - marginRight, y); y += 10;
+
+        const cliente = getDadosCliente(); const pagamento = getFormaPagamentoFormatada(); const middlePage = pageWidth / 2;
+
+        doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]); doc.roundedRect(marginLeft, y, (pageWidth/2) - marginLeft - 5, 32, 2, 2, 'F');
+        doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text("PARA:", marginLeft + 5, y + 8);
+        doc.setFontSize(11); doc.setFont("helvetica", "bold"); doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        doc.text(cliente.nome, marginLeft + 5, y + 15);
+        doc.setFontSize(10); doc.setFont("helvetica", "normal"); 
+        doc.text(`Tel: ${cliente.telefone}`, marginLeft + 5, y + 21);
+        if(cliente.cpf) {
+            doc.text(`CPF/CNPJ: ${cliente.cpf}`, marginLeft + 5, y + 27);
+        }
+
+        doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]); doc.roundedRect(middlePage + 5, y, (pageWidth/2) - marginRight - 5, 32, 2, 2, 'F');
+        doc.setFontSize(9); doc.setFont("helvetica", "bold"); doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text("FORMA DE PAGAMENTO:", middlePage + 10, y + 8);
+        doc.setFontSize(10); doc.setFont("helvetica", "normal"); doc.setTextColor(textColor[0], textColor[1], textColor[2]);
+        const splitPagamento = doc.splitTextToSize(pagamento, (pageWidth/2) - marginRight - 15); doc.text(splitPagamento, middlePage + 10, y + 15);
+
+        y += 45;
+        const tableBody = produtos.map(prod => [prod.nome, prod.quantidade.toString(), formatarMoeda(prod.precoUnitario), formatarMoeda(prod.quantidade * prod.precoUnitario)]);
+
+        doc.autoTable({
+            startY: y, head: [['Descrição do Produto', 'Qtd', 'V. Unitário', 'Total']], body: tableBody, theme: 'plain',
+            headStyles: { fillColor: primaryColor, textColor: [255, 255, 255], fontStyle: 'bold', halign: 'center' },
+            bodyStyles: { textColor: textColor, fontSize: 10, cellPadding: 6, lineColor: [226, 232, 240], lineWidth: 0.1 },
+            alternateRowStyles: { fillColor: [248, 250, 252] },
+            columnStyles: { 0: { cellWidth: 80, halign: 'left', fontStyle: 'bold' }, 1: { cellWidth: 20, halign: 'center' }, 2: { cellWidth: 35, halign: 'right' }, 3: { cellWidth: 35, halign: 'right', fontStyle: 'bold', textColor: primaryColor } },
+            margin: { left: marginLeft, right: marginRight }
+        });
+
+        let finalY = doc.lastAutoTable.finalY + 15; const totalGeral = calcularTotalGeral();
+        doc.setFillColor(lightBg[0], lightBg[1], lightBg[2]); doc.roundedRect(pageWidth - marginRight - 75, finalY, 75, 18, 2, 2, 'F');
+        doc.setFontSize(12); doc.setFont("helvetica", "bold"); doc.setTextColor(primaryColor[0], primaryColor[1], primaryColor[2]);
+        doc.text("TOTAL GERAL:", pageWidth - marginRight - 70, finalY + 12);
+        doc.setFontSize(14); doc.text(formatarMoeda(totalGeral), pageWidth - marginRight - 5, finalY + 12, { align: 'right' });
+
+        doc.setFontSize(9); doc.setFont("helvetica", "italic"); doc.setTextColor(148, 163, 184); 
+        doc.text("Este orçamento é válido por 15 dias após a data de emissão.", pageWidth / 2, pageHeight - 15, { align: 'center' });
+        doc.text(`${empresaConfig.nome} | ${empresaConfig.telefone} | Gerado em ${new Date().toLocaleString('pt-BR')}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+
+        const nomeClienteLimpo = cliente.nome.replace(/\s/g, '_').substring(0, 30);
+        const dataStr = new Date().toISOString().slice(0, 10);
+        doc.save(`Orcamento_OS${numOS}_${nomeClienteLimpo}_${dataStr}.pdf`);
+        alert("✅ PDF de Orçamento gerado com sucesso!");
+    }
+
+    function enviarWhatsApp() {
+        if (produtos.length === 0) { alert("Adicione pelo menos um produto antes de enviar."); return; }
+        const dataAtual = new Date().toLocaleString('pt-BR');
+        const cliente = getDadosCliente(), pagamento = getFormaPagamentoFormatada();
+        const numOS = numeroOSInput.value ? numeroOSInput.value.padStart(3, '0') : '001';
+        const prazoText = prazoEntregaInput.value ? prazoEntregaInput.value : 'A combinar';
+        
+        let headerTxt = `🏢 *ORÇAMENTO Nº ${numOS} - ${empresaConfig.nome}*\n📞 ${empresaConfig.telefone}\n`;
+        if(empresaConfig.cnpj) headerTxt += `📄 CNPJ: ${empresaConfig.cnpj}\n`;
+        if(empresaConfig.endereco && empresaConfig.cidade) headerTxt += `📍 ${empresaConfig.endereco} - ${empresaConfig.cidade}\n`;
+
+        let texto = `${headerTxt}\n👤 Cliente: ${cliente.nome}\n📱 Telefone: ${cliente.telefone}\n`;
+        
+        if(cliente.cpf) texto += `📄 CPF/CNPJ: ${cliente.cpf}\n`;
+        
+        texto += `💳 *${pagamento}*\n⏱️ Prazo: ${prazoText}\n📅 ${dataAtual}\n\n----------------------------------------\nITENS DO ORÇAMENTO:\n`;
+        produtos.forEach((p, i) => { texto += `${i+1}. ${p.nome} | Qtd: ${p.quantidade} | Unit: ${formatarMoeda(p.precoUnitario)} | Subtotal: ${formatarMoeda(p.quantidade * p.precoUnitario)}\n`; });
+        texto += `----------------------------------------\n💰 TOTAL GERAL: ${formatarMoeda(calcularTotalGeral())}\n\nObrigado pela preferência! 🛒\n${empresaConfig.nome}`;
+        
+        texto = texto.replace(/\*/g, '');
+        window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+    }
+
+    function adicionarExemploInicial() {
+        if (produtos.length === 0 && orcamentosSalvos.length === 0 && !currentOrcamentoId) { 
+            produtos.push({ nome: "Cadeira Office", quantidade: 2, precoUnitario: 399.90 }, { nome: "Mesa Digital", quantidade: 1, precoUnitario: 789.00 }); 
+            renderizarTabela(); 
+            if (clienteNomeInput.value === "") { clienteNomeInput.value = "Cliente Exemplo"; clienteTelefoneInput.value = "(14) 90000-0000"; salvarClienteDraft(); }
+            if (detalhesPagamentoInput.value === "") { detalhesPagamentoInput.value = "3x sem juros ou 5% à vista"; salvarPagamentoDraft(); }
+            if (prazoEntregaInput.value === "") { prazoEntregaInput.value = "5 dias úteis"; salvarDadosOrcamentoDraft(); }
+        }
+    }
+
+    function inicializarEventos() {
+        btnAdicionar.addEventListener('click', adicionarOuAtualizarProduto);
+        btnCancelarEdicao.addEventListener('click', cancelarEdicao);
+        
+        document.getElementById('btnAbrirConfig').addEventListener('click', abrirConfigEmpresa);
+        document.getElementById('btnSalvarConfig').addEventListener('click', salvarConfigEmpresa);
+        
+        document.getElementById('btnVerClientes').addEventListener('click', abrirModalClientes);
+        document.getElementById('btnSalvarClienteAba').addEventListener('click', salvarClienteDB);
+        
+        document.getElementById('btnFinanceiro').addEventListener('click', abrirModalFinanceiro);
+        document.getElementById('btnVerSalvos').addEventListener('click', abrirModalSalvos);
+        document.getElementById('btnSalvarOrcamento').addEventListener('click', salvarOrcamentoPermanente);
+        
+        btnWhatsApp.addEventListener('click', enviarWhatsApp);
+        btnPDF.addEventListener('click', gerarPDF);
+        document.getElementById('btnLimpar').addEventListener('click', iniciarNovoOrcamento);
+        
+        [inputNome, inputQtd, inputPreco].forEach(inp => inp.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); adicionarOuAtualizarProduto(); } }));
+    }
+
+    carregarDadosSalvos();
+    inicializarEventos();
+    renderizarTabela();
+</script>
+</body>
+</html>
