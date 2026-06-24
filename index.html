@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Orçamento Fácil - Daniel Negrini</title>
+    <title>Proposta Fácil - Daniel Negrini</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -23,6 +23,7 @@
             --bg-salvo-card: #f8fafc;
             --bg-logo: rgba(255,255,255,0.15);
             --bg-search: #ffffff;
+            --bg-suggestion: #ffffff;
             
             --text-primary: #1e293b;
             --text-secondary: #475569;
@@ -51,6 +52,8 @@
             --btn-warning-hover: #d97706;
             --btn-purple-bg: #7c3aed;
             --btn-purple-hover: #6d28d9;
+            --btn-edit-bg: #0ea5e9;
+            --btn-edit-hover: #0284c7;
             
             --badge-aberto-bg: #dbeafe;
             --badge-aberto-color: #1e40af;
@@ -87,6 +90,7 @@
             --bg-salvo-card: #1f2d40;
             --bg-logo: rgba(255,255,255,0.1);
             --bg-search: #1a2332;
+            --bg-suggestion: #232f41;
             
             --text-primary: #e2e8f0;
             --text-secondary: #94a3b8;
@@ -115,6 +119,8 @@
             --btn-warning-hover: #d97706;
             --btn-purple-bg: #5a2a8a;
             --btn-purple-hover: #6d28d9;
+            --btn-edit-bg: #0a6a8a;
+            --btn-edit-hover: #0284c7;
             
             --badge-aberto-bg: #1a2a5a;
             --badge-aberto-color: #7a9aee;
@@ -153,11 +159,10 @@
         .empresa-contato { font-size: 1.1rem; background: rgba(255,255,255,0.2); padding: 0.4rem 1rem; border-radius: 40px; backdrop-filter: blur(4px); }
         .empresa-contato i { margin-right: 6px; }
         
-        /* Botão Tema */
         .btn-tema { background: rgba(255,255,255,0.2); border: none; color: white; padding: 5px 12px; border-radius: 8px; cursor: pointer; font-size: 1.1rem; transition: 0.2s; display: flex; align-items: center; gap: 5px; }
         .btn-tema:hover { background: rgba(255,255,255,0.4); }
         
-        .badge-orcamento-aberto { background: var(--badge-aberto-bg); color: var(--badge-aberto-color); padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin-left: 8px; }
+        .badge-proposta-aberto { background: var(--badge-aberto-bg); color: var(--badge-aberto-color); padding: 2px 10px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; margin-left: 8px; }
         
         /* ===== TABS ===== */
         .tabs-container {
@@ -166,6 +171,7 @@
             margin-bottom: 1.5rem;
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 0.5rem;
+            flex-wrap: wrap;
         }
         .tab-btn {
             padding: 0.7rem 1.5rem;
@@ -181,25 +187,11 @@
             align-items: center;
             gap: 8px;
         }
-        .tab-btn:hover {
-            opacity: 0.8;
-        }
-        .tab-btn.active {
-            background: var(--tab-active-bg);
-            color: var(--tab-active-color);
-            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-        }
-        .tab-content {
-            display: none;
-            animation: fadeIn 0.3s ease;
-        }
-        .tab-content.active {
-            display: block;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        .tab-btn:hover { opacity: 0.8; }
+        .tab-btn.active { background: var(--tab-active-bg); color: var(--tab-active-color); box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         h2 { font-size: 1.5rem; margin: 0 0 0.8rem 0; color: #0c4e6e; border-left: 5px solid #2c7da0; padding-left: 0.9rem; }
         [data-theme="dark"] h2 { color: #5a9abe; border-left-color: #4a8aaa; }
@@ -207,7 +199,7 @@
         .form-card { background: var(--bg-card); border-radius: 1.2rem; padding: 1.3rem; margin-bottom: 1.5rem; box-shadow: 0 2px 6px var(--shadow-color); border: 1px solid var(--border-color); transition: all 0.3s ease; }
         .form-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
         .form-row-center { align-items: center; }
-        .input-group { flex: 1; min-width: 150px; }
+        .input-group { flex: 1; min-width: 150px; position: relative; }
         .input-group label { display: block; font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: #2c5a74; margin-bottom: 0.3rem; }
         [data-theme="dark"] .input-group label { color: #7a9aae; }
         .input-group input, .input-group select, .input-group textarea { width: 100%; padding: 0.7rem 0.8rem; border: 1px solid var(--border-color-input); border-radius: 0.9rem; font-size: 0.95rem; transition: 0.2s; background: var(--input-bg); color: var(--text-primary); }
@@ -220,11 +212,11 @@
         
         input#numeroOS { background-color: var(--input-disabled-bg); font-weight: bold; color: var(--text-secondary); cursor: not-allowed; border-color: var(--border-color-input); }
         input#numeroOS:focus { box-shadow: none; border-color: var(--border-color-input); }
-        select#statusOrcamento { font-weight: bold; }
-        select#statusOrcamento option[value="Orçamento"] { color: #64748b; }
-        select#statusOrcamento option[value="Confirmado"] { color: #166534; font-weight: bold; }
-        [data-theme="dark"] select#statusOrcamento option[value="Orçamento"] { color: #94a3b8; }
-        [data-theme="dark"] select#statusOrcamento option[value="Confirmado"] { color: #4ade80; }
+        select#statusProposta { font-weight: bold; }
+        select#statusProposta option[value="Proposta"] { color: #64748b; }
+        select#statusProposta option[value="Confirmado"] { color: #166534; font-weight: bold; }
+        [data-theme="dark"] select#statusProposta option[value="Proposta"] { color: #94a3b8; }
+        [data-theme="dark"] select#statusProposta option[value="Confirmado"] { color: #4ade80; }
         
         select#andamentoPedido { font-weight: bold; }
         select#andamentoPedido option[value="AGUARDANDO"] { color: #2563eb; }
@@ -245,6 +237,8 @@
         .btn-warning:hover { background: var(--btn-warning-hover); transform: scale(0.97); }
         .btn-purple { background: var(--btn-purple-bg); color: white; }
         .btn-purple:hover { background: var(--btn-purple-hover); transform: scale(0.97); }
+        .btn-edit { background: var(--btn-edit-bg); color: white; }
+        .btn-edit:hover { background: var(--btn-edit-hover); transform: scale(0.97); }
         .btn-sm { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
         
         .action-bar { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 12px; margin: 1.2rem 0 0.8rem; }
@@ -291,17 +285,13 @@
         .logo-preview { max-width: 120px; max-height: 120px; border-radius: 8px; margin: 0.5rem auto; display: block; }
         .logo-actions { display: flex; gap: 0.5rem; justify-content: center; margin-top: 0.5rem; flex-wrap: wrap; }
 
-        /* ===== BUSCA DE CLIENTES ===== */
-        .search-container {
-            position: relative;
-            width: 100%;
-        }
-        .search-results {
+        /* ===== SUGESTÃO DE CLIENTES ===== */
+        .suggestions-container {
             position: absolute;
             top: 100%;
             left: 0;
             right: 0;
-            background: var(--bg-container);
+            background: var(--bg-suggestion);
             border: 1px solid var(--border-color);
             border-radius: 0.9rem;
             max-height: 200px;
@@ -311,10 +301,8 @@
             box-shadow: 0 10px 25px var(--shadow-color);
             margin-top: 4px;
         }
-        .search-results.show {
-            display: block;
-        }
-        .search-result-item {
+        .suggestions-container.show { display: block; }
+        .suggestion-item {
             padding: 0.7rem 1rem;
             cursor: pointer;
             transition: 0.2s;
@@ -324,45 +312,50 @@
             border-bottom: 1px solid var(--border-color);
             color: var(--text-primary);
         }
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-        .search-result-item:hover {
-            background: var(--bg-card);
-        }
-        .search-result-item .cliente-info {
-            display: flex;
-            flex-direction: column;
-        }
-        .search-result-item .cliente-nome {
-            font-weight: 600;
-        }
-        .search-result-item .cliente-detalhe {
-            font-size: 0.8rem;
-            color: var(--text-muted);
-        }
-        .search-result-item .badge-selecionar {
-            background: var(--btn-primary-bg);
-            color: white;
-            padding: 0.2rem 0.8rem;
-            border-radius: 1rem;
-            font-size: 0.7rem;
-            font-weight: 600;
-        }
+        .suggestion-item:last-child { border-bottom: none; }
+        .suggestion-item:hover { background: var(--bg-card); }
+        .suggestion-item .sug-info { display: flex; flex-direction: column; }
+        .suggestion-item .sug-nome { font-weight: 600; }
+        .suggestion-item .sug-detalhe { font-size: 0.8rem; color: var(--text-muted); }
+        .suggestion-item .sug-badge { background: var(--btn-primary-bg); color: white; padding: 0.2rem 0.8rem; border-radius: 1rem; font-size: 0.7rem; font-weight: 600; }
 
-        .buscar-cliente-wrapper {
-            display: flex;
-            gap: 0.5rem;
-            align-items: flex-end;
-            flex-wrap: wrap;
+        .cliente-selecionado-info {
+            margin-top: 1rem;
+            display: none;
+            background: var(--bg-card-cliente);
+            padding: 1rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
         }
-        .buscar-cliente-wrapper .input-group {
-            flex: 2;
-            min-width: 200px;
+        .cliente-selecionado-info .cliente-nome-grande { font-size: 1.1rem; font-weight: 700; }
+        .cliente-selecionado-info .cliente-detalhes { color: var(--text-muted); font-size: 0.9rem; }
+
+        .buscar-cliente-wrapper { display: flex; gap: 0.5rem; align-items: flex-end; flex-wrap: wrap; }
+        .buscar-cliente-wrapper .input-group { flex: 2; min-width: 200px; }
+        .buscar-cliente-wrapper .btn { flex-shrink: 0; margin-bottom: 0.3rem; }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: var(--bg-container);
+            color: var(--text-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            box-shadow: 0 10px 30px var(--shadow-color);
+            border-left: 5px solid #2b8c5e;
+            display: none;
+            z-index: 2000;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
         }
-        .buscar-cliente-wrapper .btn {
-            flex-shrink: 0;
-            margin-bottom: 0.3rem;
+        .toast.show { display: block; }
+        .toast .toast-title { font-weight: 700; font-size: 1rem; }
+        .toast .toast-msg { font-size: 0.9rem; color: var(--text-muted); margin-top: 0.2rem; }
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         @media (max-width: 700px) {
@@ -381,9 +374,11 @@
             .header-clientes-acoes .btn { width: auto; flex: 1; }
             .logo-empresa { width: 50px; height: 50px; }
             .tabs-container { flex-wrap: wrap; }
-            .tab-btn { flex: 1; justify-content: center; font-size: 0.8rem; padding: 0.5rem 0.8rem; }
+            .tab-btn { flex: 1; justify-content: center; font-size: 0.75rem; padding: 0.5rem 0.5rem; min-width: 60px; }
             .buscar-cliente-wrapper { flex-direction: column; }
             .buscar-cliente-wrapper .btn { width: 100%; }
+            .suggestions-container { max-height: 150px; }
+            .toast { bottom: 10px; right: 10px; left: 10px; max-width: none; }
         }
     </style>
 </head>
@@ -397,7 +392,7 @@
             <div class="empresa-nome">
                 <span>
                     <span id="displayEmpresaNome">Daniel Negrini</span>
-                    <span id="badgeOrcamentoAberto" class="badge-orcamento-aberto" style="display:none;"><i class="fas fa-pen"></i> Editando</span>
+                    <span id="badgePropostaAberto" class="badge-proposta-aberto" style="display:none;"><i class="fas fa-pen"></i> Editando</span>
                     <button class="btn-config" id="btnAbrirConfig" title="Configurar Empresa"><i class="fas fa-cog"></i></button>
                 </span>
                 <div class="empresa-detalhes" id="displayEmpresaCnpj">CNPJ: 13.898.487/0001-13</div>
@@ -413,16 +408,25 @@
         </div>
     </div>
 
+    <!-- ===== TOAST ===== -->
+    <div id="toast" class="toast">
+        <div class="toast-title" id="toastTitle">✅ Sucesso!</div>
+        <div class="toast-msg" id="toastMsg">Operação realizada com sucesso.</div>
+    </div>
+
     <!-- ===== TABS ===== -->
     <div class="tabs-container">
-        <button class="tab-btn active" data-tab="tabNovoPedido">
-            <i class="fas fa-plus-circle"></i> Novo Pedido
+        <button class="tab-btn active" data-tab="tabNovoPedido" id="tabNovoBtn">
+            <i class="fas fa-plus-circle"></i> Novo
+        </button>
+        <button class="tab-btn" data-tab="tabCadastrarCliente">
+            <i class="fas fa-user-plus"></i> Cadastrar Cliente
         </button>
         <button class="tab-btn" data-tab="tabBuscarCliente">
             <i class="fas fa-search"></i> Buscar Cliente
         </button>
-        <button class="tab-btn" data-tab="tabOrcamentosSalvos">
-            <i class="fas fa-folder-open"></i> Orçamentos Salvos
+        <button class="tab-btn" data-tab="tabBackup">
+            <i class="fas fa-database"></i> Backup
         </button>
         <button class="tab-btn" data-tab="tabFinanceiro">
             <i class="fas fa-chart-line"></i> Financeiro
@@ -431,54 +435,60 @@
 
     <!-- ===== TAB 1: NOVO PEDIDO ===== -->
     <div id="tabNovoPedido" class="tab-content active">
+        <h2><i class="fas fa-file-invoice"></i> Nova Proposta</h2>
+        
         <div class="form-card cliente-card">
             <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; margin-bottom: 1rem;">
-                <h2 style="margin: 0; border-left-color: #2b8c5e;"><i class="fas fa-file-invoice"></i> Dados do Orçamento e Cliente</h2>
-                <div class="header-clientes-acoes">
-                    <button class="btn btn-outline btn-sm" id="btnSalvarClienteAba"><i class="fas fa-user-plus"></i> Salvar Cliente</button>
-                    <button class="btn btn-primary btn-sm" id="btnVerClientes"><i class="fas fa-users"></i> Clientes Salvos</button>
+                <h3 style="margin: 0; border-left: 3px solid #2b8c5e; padding-left: 0.8rem; font-size: 1.1rem; color: var(--text-secondary);">
+                    <i class="fas fa-user"></i> Dados do Cliente
+                </h3>
+                <div>
+                    <button class="btn btn-outline btn-sm" id="btnBuscarClienteParaPedido"><i class="fas fa-search"></i> Buscar</button>
                 </div>
             </div>
             
-            <div class="form-row" style="margin-bottom: 1rem;">
+            <div class="form-row">
                 <div class="input-group" style="max-width: 150px;">
                     <label><i class="fas fa-hashtag"></i> Número OS</label>
                     <input type="text" id="numeroOS" readonly>
                 </div>
-                <div class="input-group" style="max-width: 180px;">
-                    <label><i class="fas fa-info-circle"></i> Status do Pedido</label>
-                    <select id="statusOrcamento" onchange="atualizarCorStatus(this)">
-                        <option value="Orçamento">📝 Orçamento</option>
-                        <option value="Confirmado">✅ Confirmado</option>
-                    </select>
+                <div class="input-group" style="position: relative;">
+                    <label><i class="fas fa-user-circle"></i> Nome do cliente</label>
+                    <input type="text" id="clienteNome" placeholder="Digite o nome para buscar..." autocomplete="off">
+                    <div id="suggestionsContainer" class="suggestions-container"></div>
                 </div>
-                
-                <div class="input-group" style="max-width: 220px;">
-                    <label><i class="fas fa-cogs"></i> Andamento</label>
-                    <select id="andamentoPedido" onchange="atualizarCorAndamento(this)">
-                        <option value="">(Selecione)</option>
-                        <option value="AGUARDANDO">⏳ AGUARDANDO</option>
-                        <option value="PRODUÇÃO">⚙️ PRODUÇÃO</option>
-                        <option value="RETIRADA">📦 RETIRADA</option>
-                        <option value="ENTREGUE">✅ ENTREGUE</option>
-                    </select>
-                </div>
-
-                <div class="input-group"><label><i class="fas fa-calendar-check"></i> Prazo de Entrega</label><input type="text" id="prazoEntrega" placeholder="Ex: 5 dias úteis" autocomplete="off"></div>
-            </div>
-
-            <div class="form-row">
-                <div class="input-group"><label><i class="fas fa-user-circle"></i> Nome do cliente</label><input type="text" id="clienteNome" placeholder="Ex: João Silva" autocomplete="off"></div>
                 <div class="input-group"><label><i class="fab fa-whatsapp"></i> Telefone / WhatsApp</label><input type="text" id="clienteTelefone" placeholder="(14) 99999-9999" autocomplete="off"></div>
-                <div class="input-group"><label><i class="fas fa-id-card"></i> CPF / CNPJ (Opcional)</label><input type="text" id="clienteCpfCnpj" placeholder="Ex: 000.000.000-00" autocomplete="off"></div>
+                <div class="input-group"><label><i class="fas fa-id-card"></i> CPF / CNPJ</label><input type="text" id="clienteCpfCnpj" placeholder="Ex: 000.000.000-00" autocomplete="off"></div>
             </div>
-            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 0.5rem;"><i class="fas fa-info-circle"></i> Estes dados aparecerão no orçamento (PDF e WhatsApp).</div>
+        </div>
+
+        <div class="form-row" style="margin-bottom: 1rem;">
+            <div class="input-group" style="max-width: 180px;">
+                <label><i class="fas fa-info-circle"></i> Status da Proposta</label>
+                <select id="statusProposta" onchange="atualizarCorStatus(this)">
+                    <option value="Proposta">📝 Proposta</option>
+                    <option value="Confirmado">✅ Confirmado</option>
+                </select>
+            </div>
+            
+            <div class="input-group" style="max-width: 220px;">
+                <label><i class="fas fa-cogs"></i> Andamento</label>
+                <select id="andamentoPedido" onchange="atualizarCorAndamento(this)">
+                    <option value="">(Selecione)</option>
+                    <option value="AGUARDANDO">⏳ AGUARDANDO</option>
+                    <option value="PRODUÇÃO">⚙️ PRODUÇÃO</option>
+                    <option value="RETIRADA">📦 RETIRADA</option>
+                    <option value="ENTREGUE">✅ ENTREGUE</option>
+                </select>
+            </div>
+
+            <div class="input-group"><label><i class="fas fa-calendar-check"></i> Prazo de Entrega</label><input type="text" id="prazoEntrega" placeholder="Ex: 5 dias úteis" autocomplete="off"></div>
         </div>
 
         <!-- SEÇÃO DE OBSERVAÇÕES -->
         <div class="observacao-card">
-            <label><i class="fas fa-comment"></i> Observações / Descrição do Orçamento</label>
-            <textarea id="observacoesOrcamento" rows="2" placeholder="Adicione observações sobre o orçamento..."></textarea>
+            <label><i class="fas fa-comment"></i> Observações / Descrição da Proposta</label>
+            <textarea id="observacoesProposta" rows="2" placeholder="Adicione observações sobre a proposta..."></textarea>
         </div>
 
         <h2><i class="fas fa-cart-plus"></i> Adicionar / Editar produto ou serviço</h2>
@@ -506,7 +516,7 @@
             </div>
         </div>
 
-        <h2><i class="fas fa-list-ul"></i> Itens do orçamento</h2>
+        <h2><i class="fas fa-list-ul"></i> Itens da proposta</h2>
         <div class="table-wrapper"><table id="tabelaProdutos"><thead><tr><th style="width: 80px;">Tipo</th><th>Descrição</th><th>Qtd</th><th>Valor Unit.</th><th>Valor Total</th><th style="width: 80px;">Ações</th></tr></thead><tbody id="tbodyProdutos"><tr><td colspan="6" style="text-align:center;">Nenhum produto adicionado</td></tr></tbody></table></div>
 
         <div class="total-geral" id="totalGeral">
@@ -518,16 +528,38 @@
         </div>
 
         <div class="action-bar">
-            <button class="btn btn-primary" id="btnSalvarOrcamento"><i class="fas fa-save"></i> Salvar Orçamento</button>
+            <button class="btn btn-primary" id="btnSalvarProposta"><i class="fas fa-save"></i> Salvar Proposta</button>
             <button class="btn btn-success" id="btnWhatsApp"><i class="fab fa-whatsapp"></i> WhatsApp</button>
             <button class="btn btn-primary" id="btnPDF"><i class="fas fa-file-pdf"></i> Gerar PDF</button>
-            <button class="btn btn-danger" id="btnLimpar"><i class="fas fa-plus"></i> Novo Orçamento</button>
+            <button class="btn btn-danger" id="btnLimpar"><i class="fas fa-plus"></i> Nova Proposta</button>
         </div>
     </div>
 
-    <!-- ===== TAB 2: BUSCAR CLIENTE ===== -->
+    <!-- ===== TAB 2: CADASTRAR CLIENTE ===== -->
+    <div id="tabCadastrarCliente" class="tab-content">
+        <h2><i class="fas fa-user-plus"></i> Cadastrar Novo Cliente</h2>
+        <div class="form-card">
+            <div class="form-row">
+                <div class="input-group"><label><i class="fas fa-user-circle"></i> Nome do cliente *</label><input type="text" id="cadClienteNome" placeholder="Ex: João Silva" autocomplete="off"></div>
+            </div>
+            <div class="form-row">
+                <div class="input-group"><label><i class="fab fa-whatsapp"></i> Telefone / WhatsApp</label><input type="text" id="cadClienteTelefone" placeholder="(14) 99999-9999" autocomplete="off"></div>
+                <div class="input-group"><label><i class="fas fa-id-card"></i> CPF / CNPJ</label><input type="text" id="cadClienteCpf" placeholder="Ex: 000.000.000-00" autocomplete="off"></div>
+            </div>
+            <div style="margin-top: 1rem; display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                <button class="btn btn-success" id="btnCadastrarCliente"><i class="fas fa-save"></i> Cadastrar Cliente</button>
+                <button class="btn btn-outline" id="btnLimparCadastro"><i class="fas fa-undo"></i> Limpar</button>
+            </div>
+            <div id="mensagemCadastro" style="margin-top: 0.5rem; display: none; padding: 0.5rem 1rem; border-radius: 0.5rem;"></div>
+        </div>
+        
+        <h2><i class="fas fa-users"></i> Últimos Clientes Cadastrados</h2>
+        <div id="listaUltimosClientes"></div>
+    </div>
+
+    <!-- ===== TAB 3: BUSCAR CLIENTE ===== -->
     <div id="tabBuscarCliente" class="tab-content">
-        <h2><i class="fas fa-search"></i> Buscar Cliente Cadastrado</h2>
+        <h2><i class="fas fa-search"></i> Buscar Cliente</h2>
         <div class="form-card">
             <div class="buscar-cliente-wrapper">
                 <div class="input-group" style="flex: 2;">
@@ -537,41 +569,40 @@
                         <div id="searchResults" class="search-results"></div>
                     </div>
                 </div>
-                <button class="btn btn-primary" id="btnLimparBusca" style="margin-bottom: 0.3rem;">
+                <button class="btn btn-outline" id="btnLimparBusca" style="margin-bottom: 0.3rem;">
                     <i class="fas fa-undo"></i> Limpar
                 </button>
             </div>
             
-            <div id="clienteSelecionadoInfo" style="margin-top: 1rem; display: none; background: var(--bg-card-cliente); padding: 1rem; border-radius: 1rem; border: 1px solid var(--border-color);">
+            <div id="clienteSelecionadoInfo" class="cliente-selecionado-info">
                 <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
                     <div>
-                        <strong style="font-size: 1.1rem;" id="clienteSelecionadoNome"></strong>
-                        <div style="color: var(--text-muted); font-size: 0.9rem;" id="clienteSelecionadoDetalhes"></div>
+                        <div class="cliente-nome-grande" id="clienteSelecionadoNome"></div>
+                        <div class="cliente-detalhes" id="clienteSelecionadoDetalhes"></div>
                     </div>
                     <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
                         <button class="btn btn-success btn-sm" id="btnUsarClienteBusca"><i class="fas fa-check"></i> Usar no Pedido</button>
                         <button class="btn btn-outline btn-sm" id="btnEditarClienteBusca"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn btn-outline btn-sm" style="color: #e53e3e; border-color: #e53e3e;" id="btnExcluirClienteBusca"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 </div>
             </div>
         </div>
         
-        <div style="margin-top: 1rem;">
-            <h2><i class="fas fa-users"></i> Todos os Clientes</h2>
-            <div id="listaClientesBusca"></div>
-        </div>
+        <h2><i class="fas fa-users"></i> Todos os Clientes</h2>
+        <div id="listaClientesBusca"></div>
     </div>
 
-    <!-- ===== TAB 3: ORÇAMENTOS SALVOS ===== -->
-    <div id="tabOrcamentosSalvos" class="tab-content">
-        <h2><i class="fas fa-folder-open"></i> Orçamentos Salvos</h2>
-        <div id="listaSalvosTab"></div>
+    <!-- ===== TAB 4: BACKUP ===== -->
+    <div id="tabBackup" class="tab-content">
+        <h2><i class="fas fa-database"></i> Backup - Propostas Salvas</h2>
+        <div id="listaBackupTab"></div>
     </div>
 
-    <!-- ===== TAB 4: FINANCEIRO ===== -->
+    <!-- ===== TAB 5: FINANCEIRO ===== -->
     <div id="tabFinanceiro" class="tab-content">
         <h2><i class="fas fa-chart-bar" style="color: #2b8c5e;"></i> Relatório de Vendas</h2>
-        <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">O sistema soma automaticamente os orçamentos <strong>Confirmados</strong>.</p>
+        <p style="margin-bottom: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">O sistema soma automaticamente as propostas <strong>Confirmadas</strong>.</p>
         
         <div style="background: var(--bg-card); padding: 1.2rem; border-radius: 1rem; border: 1px solid var(--border-color); margin-bottom: 1.5rem; transition: all 0.3s ease;">
             <div class="form-row" style="align-items: flex-end;">
@@ -687,6 +718,19 @@
     </div>
 </div>
 
+<!-- ===== MODAL DE EDIÇÃO DE PROPOSTA ===== -->
+<div id="modalEditarProposta" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2><i class="fas fa-edit" style="color: #0ea5e9; margin-right: 10px;"></i> Editar Proposta</h2>
+            <button class="modal-close" onclick="fecharModal('modalEditarProposta')"><i class="fas fa-times"></i></button>
+        </div>
+        <div id="editarPropostaContainer">
+            <!-- O conteúdo será preenchido dinamicamente -->
+        </div>
+    </div>
+</div>
+
 <script>
     // ===== CONTROLE DE TEMA =====
     function alternarTema() {
@@ -724,12 +768,29 @@
         }
     }
 
+    // ===== TOAST =====
+    function showToast(title, msg, isSuccess = true) {
+        const toast = document.getElementById('toast');
+        const toastTitle = document.getElementById('toastTitle');
+        const toastMsg = document.getElementById('toastMsg');
+        
+        toastTitle.textContent = title;
+        toastMsg.textContent = msg;
+        toast.style.borderLeftColor = isSuccess ? '#2b8c5e' : '#dc2626';
+        toast.style.display = 'block';
+        
+        clearTimeout(toast._timeout);
+        toast._timeout = setTimeout(() => {
+            toast.style.display = 'none';
+        }, 4000);
+    }
+
     // ===== VARIÁVEIS GLOBAIS =====
     let produtos = [];
     let editingIndex = null;
     
-    let orcamentosSalvos = JSON.parse(localStorage.getItem('orcamentos_salvos_lista')) || [];
-    let currentOrcamentoId = localStorage.getItem('orcamento_current_id') || null;
+    let propostasSalvas = JSON.parse(localStorage.getItem('propostas_salvas_lista')) || [];
+    let currentPropostaId = localStorage.getItem('proposta_current_id') || null;
     let clientesDB = JSON.parse(localStorage.getItem('clientes_db_lista')) || [];
     let empresaConfig = JSON.parse(localStorage.getItem('empresa_config')) || {
         nome: "Daniel Negrini",
@@ -745,6 +806,7 @@
     let relatorioTxtPeriodo = "";
     let clienteSelecionadoBusca = null;
     let editandoClienteId = null;
+    let clienteSugeridoSelecionado = null;
 
     const inputNome = document.getElementById('produtoNome');
     const inputQtd = document.getElementById('produtoQtd');
@@ -763,11 +825,11 @@
     const clienteCpfCnpjInput = document.getElementById('clienteCpfCnpj');
     
     const numeroOSInput = document.getElementById('numeroOS');
-    const statusOrcamentoSelect = document.getElementById('statusOrcamento');
+    const statusPropostaSelect = document.getElementById('statusProposta');
     const andamentoPedidoSelect = document.getElementById('andamentoPedido');
     const prazoEntregaInput = document.getElementById('prazoEntrega');
     const descontoInput = document.getElementById('descontoValor');
-    const observacoesInput = document.getElementById('observacoesOrcamento');
+    const observacoesInput = document.getElementById('observacoesProposta');
 
     // ===== FUNÇÕES AUXILIARES =====
     function formatarMoeda(valor) { 
@@ -786,14 +848,81 @@
         return Math.max(0, calcularTotalBruto() - calcularDesconto());
     }
 
+    // ===== FUNÇÃO MELHORADA PARA NUMERAÇÃO SEQUENCIAL DE OS =====
     function getNextAvailableOS() {
-        if (orcamentosSalvos.length === 0) return "1";
+        const propostasAtivas = propostasSalvas.filter(o => !o.excluido);
+        
+        if (propostasAtivas.length === 0) {
+            return "1";
+        }
+        
         let maxOS = 0;
-        orcamentosSalvos.forEach(o => { 
+        propostasAtivas.forEach(o => { 
             let num = parseInt(o.os); 
-            if (num > maxOS) maxOS = num; 
+            if (!isNaN(num) && num > maxOS) maxOS = num; 
         });
+        
         return (maxOS + 1).toString();
+    }
+
+    // ===== FUNÇÃO PARA LIMPAR COMPLETAMENTE O FORMULÁRIO =====
+    function limparFormulario() {
+        produtos = [];
+        if (editingIndex !== null) cancelarEdicao();
+        
+        clienteNomeInput.value = '';
+        clienteTelefoneInput.value = '';
+        clienteCpfCnpjInput.value = '';
+        
+        prazoEntregaInput.value = '';
+        observacoesInput.value = '';
+        descontoInput.value = '0';
+        
+        statusPropostaSelect.value = "Proposta";
+        atualizarCorStatus(statusPropostaSelect);
+        andamentoPedidoSelect.value = "";
+        atualizarCorAndamento(andamentoPedidoSelect);
+        
+        const novaOS = getNextAvailableOS();
+        numeroOSInput.value = novaOS;
+        localStorage.setItem('proposta_os_draft', novaOS);
+        
+        currentPropostaId = null;
+        localStorage.removeItem('proposta_current_id');
+        document.getElementById('badgePropostaAberto').style.display = 'none';
+        
+        localStorage.removeItem('proposta_cliente_nome');
+        localStorage.removeItem('proposta_cliente_telefone');
+        localStorage.removeItem('proposta_cliente_cpf');
+        localStorage.removeItem('proposta_prazo');
+        localStorage.removeItem('proposta_status_draft');
+        localStorage.removeItem('proposta_andamento_draft');
+        localStorage.removeItem('proposta_desconto');
+        localStorage.removeItem('proposta_observacoes');
+        localStorage.removeItem('proposta_produtos_draft');
+        
+        renderizarTabela();
+        atualizarTotalGeralUI();
+        
+        document.getElementById('suggestionsContainer').classList.remove('show');
+        
+        setTimeout(() => {
+            clienteNomeInput.focus();
+        }, 100);
+    }
+
+    // ===== FUNÇÃO PARA INICIAR NOVA PROPOSTA (CHAMADA PELA ABA NOVO) =====
+    function iniciarNovaPropostaAba() {
+        if (produtos.length > 0) {
+            if (!confirm("Iniciar uma nova proposta? Todas as informações serão apagadas.")) {
+                return;
+            }
+        }
+        
+        limparFormulario();
+        showToast('🔄 Nova proposta!', `OS Nº ${numeroOSInput.value} pronta para uso.`, true);
+        
+        document.querySelector('[data-tab="tabNovoPedido"]').click();
     }
 
     // ===== FUNÇÕES DE UI =====
@@ -987,21 +1116,87 @@
 
     // ===== PERSISTÊNCIA (DRAFT) =====
     function salvarClienteDraft() { 
-        localStorage.setItem('orcamento_cliente_nome', clienteNomeInput.value); 
-        localStorage.setItem('orcamento_cliente_telefone', clienteTelefoneInput.value); 
-        localStorage.setItem('orcamento_cliente_cpf', clienteCpfCnpjInput.value); 
+        localStorage.setItem('proposta_cliente_nome', clienteNomeInput.value); 
+        localStorage.setItem('proposta_cliente_telefone', clienteTelefoneInput.value); 
+        localStorage.setItem('proposta_cliente_cpf', clienteCpfCnpjInput.value); 
     }
     
-    function salvarDadosOrcamentoDraft() { 
-        localStorage.setItem('orcamento_prazo', prazoEntregaInput.value); 
-        localStorage.setItem('orcamento_status_draft', statusOrcamentoSelect.value); 
-        localStorage.setItem('orcamento_andamento_draft', andamentoPedidoSelect.value);
-        localStorage.setItem('orcamento_desconto', descontoInput.value);
-        localStorage.setItem('orcamento_observacoes', observacoesInput.value);
+    function salvarDadosPropostaDraft() { 
+        localStorage.setItem('proposta_prazo', prazoEntregaInput.value); 
+        localStorage.setItem('proposta_status_draft', statusPropostaSelect.value); 
+        localStorage.setItem('proposta_andamento_draft', andamentoPedidoSelect.value);
+        localStorage.setItem('proposta_desconto', descontoInput.value);
+        localStorage.setItem('proposta_observacoes', observacoesInput.value);
     }
     
     function salvarProdutosDraft() { 
-        localStorage.setItem('orcamento_produtos_draft', JSON.stringify(produtos)); 
+        localStorage.setItem('proposta_produtos_draft', JSON.stringify(produtos)); 
+    }
+
+    // ===== SUGESTÃO DE CLIENTES (BUSCA AUTOMÁTICA) =====
+    function buscarSugestoesClientes(termo) {
+        if (!termo || termo.trim() === '') {
+            document.getElementById('suggestionsContainer').classList.remove('show');
+            return [];
+        }
+        
+        const termoLower = termo.toLowerCase().trim();
+        const resultados = clientesDB.filter(c => {
+            const nomeMatch = c.nome.toLowerCase().includes(termoLower);
+            const telefoneMatch = c.telefone && c.telefone.includes(termo);
+            const cpfMatch = c.cpf && c.cpf.includes(termo);
+            return nomeMatch || telefoneMatch || cpfMatch;
+        });
+        
+        return resultados.slice(0, 8);
+    }
+
+    function renderizarSugestoes(resultados) {
+        const container = document.getElementById('suggestionsContainer');
+        container.innerHTML = '';
+        
+        if (resultados.length === 0) {
+            container.classList.remove('show');
+            return;
+        }
+        
+        resultados.forEach(c => {
+            const div = document.createElement('div');
+            div.className = 'suggestion-item';
+            div.innerHTML = `
+                <div class="sug-info">
+                    <span class="sug-nome">${c.nome}</span>
+                    <span class="sug-detalhe">${c.telefone || 'Sem telefone'} ${c.cpf ? '| ' + c.cpf : ''}</span>
+                </div>
+                <span class="sug-badge">Selecionar</span>
+            `;
+            div.addEventListener('click', () => selecionarClienteSugerido(c));
+            container.appendChild(div);
+        });
+        
+        container.classList.add('show');
+    }
+
+    function selecionarClienteSugerido(cliente) {
+        clienteSugeridoSelecionado = cliente;
+        clienteNomeInput.value = cliente.nome;
+        clienteTelefoneInput.value = cliente.telefone || '';
+        clienteCpfCnpjInput.value = cliente.cpf || '';
+        document.getElementById('suggestionsContainer').classList.remove('show');
+        salvarClienteDraft();
+        
+        clienteNomeInput.style.borderColor = '#2b8c5e';
+        clienteNomeInput.style.backgroundColor = '#dcfce7';
+        setTimeout(() => {
+            clienteNomeInput.style.borderColor = '';
+            clienteNomeInput.style.backgroundColor = '';
+        }, 1000);
+    }
+
+    function fecharSugestoes() {
+        setTimeout(() => {
+            document.getElementById('suggestionsContainer').classList.remove('show');
+        }, 200);
     }
 
     // ===== TABS =====
@@ -1019,20 +1214,110 @@
                 this.classList.add('active');
                 document.getElementById(target).classList.add('active');
                 
+                if (target === 'tabNovoPedido') {
+                    iniciarNovaPropostaAba();
+                }
+                
                 if (target === 'tabBuscarCliente') {
                     renderizarListaClientesBusca();
                 }
-                if (target === 'tabOrcamentosSalvos') {
-                    renderizarOrcamentosSalvosTab();
+                if (target === 'tabBackup') {
+                    renderizarBackupTab();
                 }
                 if (target === 'tabFinanceiro') {
                     atualizarDadosRelatorio();
+                }
+                if (target === 'tabCadastrarCliente') {
+                    renderizarUltimosClientes();
                 }
             });
         });
     }
 
-    // ===== BUSCA DE CLIENTES =====
+    // ===== CADASTRAR CLIENTE =====
+    function cadastrarCliente() {
+        const nome = document.getElementById('cadClienteNome').value.trim();
+        const telefone = document.getElementById('cadClienteTelefone').value.trim();
+        const cpf = document.getElementById('cadClienteCpf').value.trim();
+        const msgDiv = document.getElementById('mensagemCadastro');
+        
+        if (!nome) {
+            msgDiv.style.display = 'block';
+            msgDiv.style.background = '#fee2e2';
+            msgDiv.style.color = '#991b1b';
+            msgDiv.textContent = '⚠️ O nome do cliente é obrigatório!';
+            return;
+        }
+        
+        const existente = clientesDB.find(c => c.nome.toLowerCase() === nome.toLowerCase());
+        if (existente) {
+            msgDiv.style.display = 'block';
+            msgDiv.style.background = '#fef3c7';
+            msgDiv.style.color = '#92400e';
+            msgDiv.textContent = '⚠️ Cliente já cadastrado! Use a busca para localizá-lo.';
+            return;
+        }
+        
+        clientesDB.push({
+            id: Date.now().toString(),
+            nome: nome,
+            telefone: telefone,
+            cpf: cpf
+        });
+        
+        localStorage.setItem('clientes_db_lista', JSON.stringify(clientesDB));
+        
+        msgDiv.style.display = 'block';
+        msgDiv.style.background = '#dcfce7';
+        msgDiv.style.color = '#166534';
+        msgDiv.textContent = '✅ Cliente cadastrado com sucesso!';
+        
+        document.getElementById('cadClienteNome').value = '';
+        document.getElementById('cadClienteTelefone').value = '';
+        document.getElementById('cadClienteCpf').value = '';
+        
+        renderizarUltimosClientes();
+        renderizarListaClientesBusca();
+        
+        setTimeout(() => {
+            msgDiv.style.display = 'none';
+        }, 4000);
+    }
+
+    function limparCadastro() {
+        document.getElementById('cadClienteNome').value = '';
+        document.getElementById('cadClienteTelefone').value = '';
+        document.getElementById('cadClienteCpf').value = '';
+        document.getElementById('mensagemCadastro').style.display = 'none';
+    }
+
+    function renderizarUltimosClientes() {
+        const container = document.getElementById('listaUltimosClientes');
+        container.innerHTML = '';
+        
+        if (clientesDB.length === 0) {
+            container.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 1rem;">Nenhum cliente cadastrado ainda.</p>';
+            return;
+        }
+        
+        const ultimos = [...clientesDB].reverse().slice(0, 10);
+        ultimos.forEach(c => {
+            const card = document.createElement('div');
+            card.className = 'salvo-card';
+            card.innerHTML = `
+                <div class="salvo-info">
+                    <strong>${c.nome}</strong>
+                    <span>${c.telefone || 'Sem telefone'} ${c.cpf ? '| ' + c.cpf : ''}</span>
+                </div>
+                <div class="salvo-acoes">
+                    <button class="btn btn-primary btn-sm" onclick="usarClienteNoPedidoById('${c.id}')"><i class="fas fa-check"></i> Usar</button>
+                </div>
+            `;
+            container.appendChild(card);
+        });
+    }
+
+    // ===== BUSCA DE CLIENTES (TAB) =====
     function buscarClientes(termo) {
         if (!termo || termo.trim() === '') {
             document.getElementById('searchResults').classList.remove('show');
@@ -1094,21 +1379,36 @@
         renderizarListaClientesBusca();
     }
 
+    function usarClienteNoPedidoById(id) {
+        const cliente = clientesDB.find(c => c.id === id);
+        if (!cliente) return;
+        
+        limparFormulario();
+        
+        clienteNomeInput.value = cliente.nome;
+        clienteTelefoneInput.value = cliente.telefone || '';
+        clienteCpfCnpjInput.value = cliente.cpf || '';
+        salvarClienteDraft();
+        
+        document.querySelector('[data-tab="tabNovoPedido"]').click();
+        showToast('✅ Cliente carregado!', `Cliente "${cliente.nome}" carregado no pedido.`);
+    }
+
     function usarClienteNoPedido() {
         if (!clienteSelecionadoBusca) {
             alert('Selecione um cliente primeiro.');
             return;
         }
         
+        limparFormulario();
+        
         clienteNomeInput.value = clienteSelecionadoBusca.nome;
         clienteTelefoneInput.value = clienteSelecionadoBusca.telefone || '';
         clienteCpfCnpjInput.value = clienteSelecionadoBusca.cpf || '';
         salvarClienteDraft();
         
-        // Mudar para a aba Novo Pedido
         document.querySelector('[data-tab="tabNovoPedido"]').click();
-        
-        alert('✅ Cliente carregado no pedido!');
+        showToast('✅ Cliente carregado!', `Cliente "${clienteSelecionadoBusca.nome}" carregado no pedido.`);
     }
 
     function limparBuscaCliente() {
@@ -1132,6 +1432,24 @@
         document.getElementById('modalEditarCliente').style.display = 'flex';
     }
 
+    function excluirClienteBusca() {
+        if (!clienteSelecionadoBusca) {
+            alert('Selecione um cliente primeiro.');
+            return;
+        }
+        
+        if (confirm(`Tem certeza que deseja excluir o cliente "${clienteSelecionadoBusca.nome}"?`)) {
+            clientesDB = clientesDB.filter(c => c.id !== clienteSelecionadoBusca.id);
+            localStorage.setItem('clientes_db_lista', JSON.stringify(clientesDB));
+            clienteSelecionadoBusca = null;
+            document.getElementById('clienteSelecionadoInfo').style.display = 'none';
+            document.getElementById('buscarClienteInput').value = '';
+            renderizarListaClientesBusca();
+            renderizarUltimosClientes();
+            showToast('🗑️ Cliente excluído!', 'Cliente removido com sucesso.', true);
+        }
+    }
+
     function salvarEdicaoCliente() {
         const nome = document.getElementById('editClienteNome').value.trim();
         const telefone = document.getElementById('editClienteTelefone').value.trim();
@@ -1149,7 +1467,6 @@
             clientesDB[index].cpf = cpf;
             localStorage.setItem('clientes_db_lista', JSON.stringify(clientesDB));
             
-            // Atualizar seleção
             clienteSelecionadoBusca = clientesDB[index];
             document.getElementById('clienteSelecionadoNome').textContent = nome;
             document.getElementById('clienteSelecionadoDetalhes').innerHTML = `
@@ -1160,7 +1477,8 @@
             
             fecharModal('modalEditarCliente');
             renderizarListaClientesBusca();
-            alert('✅ Cliente atualizado com sucesso!');
+            renderizarUltimosClientes();
+            showToast('✅ Cliente atualizado!', 'Dados do cliente salvos com sucesso.', true);
         }
     }
 
@@ -1208,8 +1526,9 @@
         }
         
         localStorage.setItem('clientes_db_lista', JSON.stringify(clientesDB));
-        alert("👤 Cliente salvo no banco de dados!");
+        showToast('👤 Cliente salvo!', 'Cliente salvo no banco de dados com sucesso.', true);
         renderizarListaClientesBusca();
+        renderizarUltimosClientes();
     }
 
     function abrirModalClientes() {
@@ -1243,6 +1562,7 @@
     window.usarCliente = function(id) {
         const c = clientesDB.find(x => x.id === id);
         if (c) {
+            limparFormulario();
             clienteNomeInput.value = c.nome;
             clienteTelefoneInput.value = c.telefone;
             clienteCpfCnpjInput.value = c.cpf || ''; 
@@ -1261,24 +1581,28 @@
                 document.getElementById('buscarClienteInput').value = '';
             }
             renderizarListaClientesBusca();
+            renderizarUltimosClientes();
             abrirModalClientes();
         }
     };
 
-    // ===== ORÇAMENTOS SALVOS =====
-    function salvarOrcamentoPermanente() {
-        if (produtos.length === 0) { alert("Adicione produtos antes de salvar o orçamento."); return; }
-        let isNew = !currentOrcamentoId;
+    // ===== PROPOSTAS SALVAS =====
+    function salvarPropostaPermanente() {
+        if (produtos.length === 0) { 
+            alert("Adicione produtos antes de salvar a proposta."); 
+            return; 
+        }
+        let isNew = !currentPropostaId;
         if (isNew) { 
-            currentOrcamentoId = "ORC_" + Date.now(); 
-            localStorage.setItem('orcamento_current_id', currentOrcamentoId);
+            currentPropostaId = "PROP_" + Date.now(); 
+            localStorage.setItem('proposta_current_id', currentPropostaId);
         }
 
-        const orcamentoObj = {
-            id: currentOrcamentoId, 
+        const propostaObj = {
+            id: currentPropostaId, 
             os: numeroOSInput.value, 
             dataHora: new Date().toISOString(),
-            status: statusOrcamentoSelect.value, 
+            status: statusPropostaSelect.value, 
             andamento: andamentoPedidoSelect.value,
             excluido: false,
             clienteNome: clienteNomeInput.value, 
@@ -1293,63 +1617,266 @@
             total: calcularTotalGeral()
         };
 
-        const index = orcamentosSalvos.findIndex(o => o.id === currentOrcamentoId);
+        const index = propostasSalvas.findIndex(o => o.id === currentPropostaId);
         if (index >= 0) { 
-            orcamentosSalvos[index] = orcamentoObj; 
+            propostasSalvas[index] = propostaObj; 
         } else { 
-            orcamentosSalvos.push(orcamentoObj); 
+            propostasSalvas.push(propostaObj); 
         }
 
-        localStorage.setItem('orcamentos_salvos_lista', JSON.stringify(orcamentosSalvos));
-        document.getElementById('badgeOrcamentoAberto').style.display = 'inline-block';
-        alert(`✅ OS Nº ${orcamentoObj.os} salva com sucesso!`);
+        localStorage.setItem('propostas_salvas_lista', JSON.stringify(propostasSalvas));
+        document.getElementById('badgePropostaAberto').style.display = 'inline-block';
+        showToast('✅ Proposta salva!', `OS Nº ${propostaObj.os} salva com sucesso!`, true);
     }
 
-    // ===== DUPLICAR ORÇAMENTO =====
-    window.duplicarOrcamento = function(id) {
-        const orcamento = orcamentosSalvos.find(o => o.id === id);
-        if (!orcamento) return;
+    // ===== DUPLICAR PROPOSTA =====
+    window.duplicarProposta = function(id) {
+        const proposta = propostasSalvas.find(o => o.id === id);
+        if (!proposta) return;
         
-        const novoId = "ORC_" + Date.now();
+        const novoId = "PROP_" + Date.now();
         const novaOS = getNextAvailableOS();
-        const novoOrcamento = {
-            ...orcamento,
+        const novaProposta = {
+            ...proposta,
             id: novoId,
             os: novaOS,
             dataHora: new Date().toISOString(),
-            status: "Orçamento",
+            status: "Proposta",
             excluido: false
         };
         
-        const totalBruto = novoOrcamento.produtos.reduce((acc, p) => acc + (p.quantidade * p.precoUnitario), 0);
-        const desconto = novoOrcamento.desconto || 0;
-        novoOrcamento.total = Math.max(0, totalBruto - desconto);
+        const totalBruto = novaProposta.produtos.reduce((acc, p) => acc + (p.quantidade * p.precoUnitario), 0);
+        const desconto = novaProposta.desconto || 0;
+        novaProposta.total = Math.max(0, totalBruto - desconto);
         
-        orcamentosSalvos.push(novoOrcamento);
-        localStorage.setItem('orcamentos_salvos_lista', JSON.stringify(orcamentosSalvos));
-        renderizarOrcamentosSalvosTab();
-        alert(`✅ Orçamento duplicado como OS Nº ${novaOS}!`);
+        propostasSalvas.push(novaProposta);
+        localStorage.setItem('propostas_salvas_lista', JSON.stringify(propostasSalvas));
+        renderizarBackupTab();
+        showToast('📋 Proposta duplicada!', `Proposta duplicada como OS Nº ${novaOS}!`, true);
     };
 
-    function renderizarOrcamentosSalvosTab() {
-        const divLista = document.getElementById('listaSalvosTab');
+    // ===== FUNÇÃO PARA ABRIR PROPOSTA =====
+    window.abrirPropostaBackup = function(id) {
+        const proposta = propostasSalvas.find(o => o.id === id);
+        if (!proposta) return;
+        
+        limparFormulario();
+        
+        currentPropostaId = proposta.id; 
+        localStorage.setItem('proposta_current_id', currentPropostaId);
+        numeroOSInput.value = proposta.os; 
+        localStorage.setItem('proposta_os_draft', proposta.os);
+        document.getElementById('badgePropostaAberto').style.display = 'inline-block';
+        
+        statusPropostaSelect.value = proposta.status || "Proposta"; 
+        atualizarCorStatus(statusPropostaSelect);
+        
+        andamentoPedidoSelect.value = proposta.andamento || "";
+        atualizarCorAndamento(andamentoPedidoSelect);
+        
+        clienteNomeInput.value = proposta.clienteNome; 
+        clienteTelefoneInput.value = proposta.clienteTelefone;
+        clienteCpfCnpjInput.value = proposta.clienteCpf || ''; 
+        
+        prazoEntregaInput.value = proposta.prazo; 
+        descontoInput.value = proposta.desconto || 0;
+        observacoesInput.value = proposta.observacoes || '';
+        
+        produtos = JSON.parse(JSON.stringify(proposta.produtos));
+        salvarClienteDraft(); 
+        salvarDadosPropostaDraft(); 
+        salvarProdutosDraft();
+        renderizarTabela(); 
+        document.querySelector('[data-tab="tabNovoPedido"]').click();
+        atualizarTotalGeralUI();
+        showToast('📂 Proposta carregada!', `OS Nº ${proposta.os} carregada com sucesso.`, true);
+    };
+
+    // ===== FUNÇÃO PARA EDITAR PROPOSTA (BOTÃO EDITAR) =====
+    window.editarPropostaBackup = function(id) {
+        const proposta = propostasSalvas.find(o => o.id === id);
+        if (!proposta) return;
+        
+        const container = document.getElementById('editarPropostaContainer');
+        container.innerHTML = '';
+        
+        const formHTML = `
+            <div style="margin-bottom: 1rem;">
+                <h3 style="margin-bottom: 1rem; color: var(--text-primary);">Editando OS Nº ${proposta.os}</h3>
+                
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Número OS</label>
+                        <input type="text" id="editOSNumero" value="${proposta.os}" readonly style="background-color: var(--input-disabled-bg);">
+                    </div>
+                    <div class="input-group">
+                        <label>Status</label>
+                        <select id="editStatusProposta" onchange="atualizarCorStatus(this)">
+                            <option value="Proposta" ${proposta.status === 'Proposta' ? 'selected' : ''}>📝 Proposta</option>
+                            <option value="Confirmado" ${proposta.status === 'Confirmado' ? 'selected' : ''}>✅ Confirmado</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Andamento</label>
+                        <select id="editAndamentoPedido" onchange="atualizarCorAndamento(this)">
+                            <option value="">(Selecione)</option>
+                            <option value="AGUARDANDO" ${proposta.andamento === 'AGUARDANDO' ? 'selected' : ''}>⏳ AGUARDANDO</option>
+                            <option value="PRODUÇÃO" ${proposta.andamento === 'PRODUÇÃO' ? 'selected' : ''}>⚙️ PRODUÇÃO</option>
+                            <option value="RETIRADA" ${proposta.andamento === 'RETIRADA' ? 'selected' : ''}>📦 RETIRADA</option>
+                            <option value="ENTREGUE" ${proposta.andamento === 'ENTREGUE' ? 'selected' : ''}>✅ ENTREGUE</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="form-row" style="margin-top: 1rem;">
+                    <div class="input-group">
+                        <label>Cliente</label>
+                        <input type="text" id="editClienteNome" value="${proposta.clienteNome || ''}">
+                    </div>
+                    <div class="input-group">
+                        <label>Telefone</label>
+                        <input type="text" id="editClienteTelefone" value="${proposta.clienteTelefone || ''}">
+                    </div>
+                    <div class="input-group">
+                        <label>CPF/CNPJ</label>
+                        <input type="text" id="editClienteCpf" value="${proposta.clienteCpf || ''}">
+                    </div>
+                </div>
+                
+                <div class="form-row" style="margin-top: 1rem;">
+                    <div class="input-group">
+                        <label>Prazo de Entrega</label>
+                        <input type="text" id="editPrazoEntrega" value="${proposta.prazo || ''}">
+                    </div>
+                    <div class="input-group">
+                        <label>Desconto (R$)</label>
+                        <input type="number" id="editDesconto" step="0.01" min="0" value="${proposta.desconto || 0}">
+                    </div>
+                </div>
+                
+                <div class="observacao-card" style="margin-top: 1rem;">
+                    <label>Observações</label>
+                    <textarea id="editObservacoes" rows="3">${proposta.observacoes || ''}</textarea>
+                </div>
+                
+                <div style="margin-top: 1.5rem; display: flex; gap: 0.5rem; justify-content: flex-end; flex-wrap: wrap;">
+                    <button class="btn btn-outline" onclick="fecharModal('modalEditarProposta')"><i class="fas fa-times"></i> Cancelar</button>
+                    <button class="btn btn-edit" id="btnSalvarEdicaoProposta" data-id="${proposta.id}"><i class="fas fa-save"></i> Salvar Alterações</button>
+                </div>
+            </div>
+        `;
+        
+        container.innerHTML = formHTML;
+        
+        const statusSelect = document.getElementById('editStatusProposta');
+        const andamentoSelect = document.getElementById('editAndamentoPedido');
+        if (statusSelect) atualizarCorStatus(statusSelect);
+        if (andamentoSelect) atualizarCorAndamento(andamentoSelect);
+        
+        document.getElementById('btnSalvarEdicaoProposta').addEventListener('click', function() {
+            const propId = this.dataset.id;
+            salvarEdicaoProposta(propId);
+        });
+        
+        document.getElementById('modalEditarProposta').style.display = 'flex';
+    };
+
+    // ===== FUNÇÃO PARA SALVAR EDIÇÃO DA PROPOSTA =====
+    function salvarEdicaoProposta(id) {
+        const proposta = propostasSalvas.find(o => o.id === id);
+        if (!proposta) {
+            alert('Proposta não encontrada!');
+            return;
+        }
+        
+        const novoStatus = document.getElementById('editStatusProposta').value;
+        const novoAndamento = document.getElementById('editAndamentoPedido').value;
+        const novoClienteNome = document.getElementById('editClienteNome').value.trim();
+        const novoClienteTelefone = document.getElementById('editClienteTelefone').value.trim();
+        const novoClienteCpf = document.getElementById('editClienteCpf').value.trim();
+        const novoPrazo = document.getElementById('editPrazoEntrega').value.trim();
+        const novoDesconto = parseFloat(document.getElementById('editDesconto').value) || 0;
+        const novasObservacoes = document.getElementById('editObservacoes').value.trim();
+        
+        if (!novoClienteNome) {
+            alert('O nome do cliente é obrigatório!');
+            return;
+        }
+        
+        proposta.status = novoStatus;
+        proposta.andamento = novoAndamento;
+        proposta.clienteNome = novoClienteNome;
+        proposta.clienteTelefone = novoClienteTelefone;
+        proposta.clienteCpf = novoClienteCpf;
+        proposta.prazo = novoPrazo;
+        proposta.desconto = novoDesconto;
+        proposta.observacoes = novasObservacoes;
+        
+        const totalBruto = proposta.produtos.reduce((acc, p) => acc + (p.quantidade * p.precoUnitario), 0);
+        proposta.total = Math.max(0, totalBruto - novoDesconto);
+        
+        localStorage.setItem('propostas_salvas_lista', JSON.stringify(propostasSalvas));
+        
+        if (currentPropostaId === id) {
+            statusPropostaSelect.value = novoStatus;
+            atualizarCorStatus(statusPropostaSelect);
+            andamentoPedidoSelect.value = novoAndamento;
+            atualizarCorAndamento(andamentoPedidoSelect);
+            clienteNomeInput.value = novoClienteNome;
+            clienteTelefoneInput.value = novoClienteTelefone;
+            clienteCpfCnpjInput.value = novoClienteCpf;
+            prazoEntregaInput.value = novoPrazo;
+            descontoInput.value = novoDesconto;
+            observacoesInput.value = novasObservacoes;
+            atualizarTotalGeralUI();
+            
+            salvarClienteDraft();
+            salvarDadosPropostaDraft();
+        }
+        
+        fecharModal('modalEditarProposta');
+        renderizarBackupTab();
+        showToast('✅ Proposta atualizada!', `OS Nº ${proposta.os} atualizada com sucesso!`, true);
+    }
+
+    // ===== FUNÇÃO PARA EXCLUIR PROPOSTA =====
+    window.excluirPropostaBackup = function(id) {
+        if (confirm('Tem certeza que deseja excluir esta proposta da lista? (Se estiver "Confirmado", o valor continuará salvo no Financeiro)')) {
+            const index = propostasSalvas.findIndex(o => o.id === id);
+            if (index > -1) {
+                propostasSalvas[index].excluido = true; 
+            }
+            localStorage.setItem('propostas_salvas_lista', JSON.stringify(propostasSalvas));
+            if (currentPropostaId === id) { 
+                currentPropostaId = null; 
+                localStorage.removeItem('proposta_current_id');
+                document.getElementById('badgePropostaAberto').style.display = 'none';
+            }
+            renderizarBackupTab();
+            showToast('🗑️ Proposta excluída!', 'Proposta removida da lista.', true);
+        }
+    };
+
+    // ===== RENDERIZAR BACKUP =====
+    function renderizarBackupTab() {
+        const divLista = document.getElementById('listaBackupTab');
         divLista.innerHTML = '';
         
-        let orcamentosVisiveis = orcamentosSalvos.filter(o => !o.excluido);
+        let propostasVisiveis = propostasSalvas.filter(o => !o.excluido);
         
-        if (orcamentosVisiveis.length === 0) {
-            divLista.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">Você ainda não possui orçamentos salvos.</p>';
+        if (propostasVisiveis.length === 0) {
+            divLista.innerHTML = '<p style="text-align: center; color: var(--text-muted); padding: 2rem;">Você ainda não possui propostas salvas.</p>';
         } else {
-            let ordenados = [...orcamentosVisiveis].sort((a, b) => parseInt(b.os) - parseInt(a.os));
+            let ordenados = [...propostasVisiveis].sort((a, b) => parseInt(b.os) - parseInt(a.os));
             ordenados.forEach(o => {
                 const dataFormatada = new Date(o.dataHora).toLocaleDateString('pt-BR');
                 const card = document.createElement('div'); 
                 card.className = 'salvo-card';
                 
-                const isCurrent = (o.id === currentOrcamentoId) ? '<span style="color:#2b8c5e; font-weight:bold; font-size: 0.8rem; margin-left: 10px;"><i class="fas fa-arrow-right"></i> ABERTO</span>' : '';
+                const isCurrent = (o.id === currentPropostaId) ? '<span style="color:#2b8c5e; font-weight:bold; font-size: 0.8rem; margin-left: 10px;"><i class="fas fa-arrow-right"></i> ABERTO</span>' : '';
                 const badgeStatus = (o.status === "Confirmado") 
                     ? '<span style="background: #dcfce7; color: #166534; padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; margin-left: 10px;">✅ Confirmado</span>' 
-                    : '<span style="background: var(--bg-card); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 10px;">📝 Orçamento</span>';
+                    : '<span style="background: var(--bg-card); color: var(--text-muted); padding: 3px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 10px;">📝 Proposta</span>';
 
                 let badgeAndamento = '';
                 if(o.andamento === 'AGUARDANDO') {
@@ -1373,9 +1900,10 @@
                         ${o.observacoes ? `<span style="color: var(--text-muted); font-size: 0.8rem;"><i class="fas fa-comment"></i> ${o.observacoes.substring(0, 60)}${o.observacoes.length > 60 ? '...' : ''}</span>` : ''}
                     </div>
                     <div class="salvo-acoes">
-                        <button class="btn btn-primary btn-sm" onclick="carregarOrcamentoSalvo('${o.id}')"><i class="fas fa-folder-open"></i> Abrir</button>
-                        <button class="btn btn-purple btn-sm" onclick="duplicarOrcamento('${o.id}')"><i class="fas fa-copy"></i> Duplicar</button>
-                        <button class="btn btn-danger btn-sm" onclick="excluirOrcamentoSalvo('${o.id}')"><i class="fas fa-trash-alt"></i></button>
+                        <button class="btn btn-primary btn-sm" onclick="abrirPropostaBackup('${o.id}')"><i class="fas fa-folder-open"></i> Abrir</button>
+                        <button class="btn btn-edit btn-sm" onclick="editarPropostaBackup('${o.id}')"><i class="fas fa-edit"></i> Editar</button>
+                        <button class="btn btn-purple btn-sm" onclick="duplicarProposta('${o.id}')"><i class="fas fa-copy"></i> Duplicar</button>
+                        <button class="btn btn-danger btn-sm" onclick="excluirPropostaBackup('${o.id}')"><i class="fas fa-trash-alt"></i></button>
                     </div>
                 `;
                 divLista.appendChild(card);
@@ -1383,87 +1911,22 @@
         }
     }
 
-    window.carregarOrcamentoSalvo = function(id) {
-        const orcamento = orcamentosSalvos.find(o => o.id === id);
-        if (!orcamento) return;
-        currentOrcamentoId = orcamento.id; 
-        localStorage.setItem('orcamento_current_id', currentOrcamentoId);
-        numeroOSInput.value = orcamento.os; 
-        localStorage.setItem('orcamento_os_draft', orcamento.os);
-        document.getElementById('badgeOrcamentoAberto').style.display = 'inline-block';
-        
-        statusOrcamentoSelect.value = orcamento.status || "Orçamento"; 
-        atualizarCorStatus(statusOrcamentoSelect);
-        
-        andamentoPedidoSelect.value = orcamento.andamento || "";
-        atualizarCorAndamento(andamentoPedidoSelect);
-        
-        clienteNomeInput.value = orcamento.clienteNome; 
-        clienteTelefoneInput.value = orcamento.clienteTelefone;
-        clienteCpfCnpjInput.value = orcamento.clienteCpf || ''; 
-        
-        prazoEntregaInput.value = orcamento.prazo; 
-        descontoInput.value = orcamento.desconto || 0;
-        observacoesInput.value = orcamento.observacoes || '';
-        
-        produtos = JSON.parse(JSON.stringify(orcamento.produtos));
-        salvarClienteDraft(); 
-        salvarDadosOrcamentoDraft(); 
-        salvarProdutosDraft();
-        renderizarTabela(); 
-        document.querySelector('[data-tab="tabNovoPedido"]').click();
-        atualizarTotalGeralUI();
-        alert(`📂 Orçamento OS Nº ${orcamento.os} carregado!`);
-    };
-
-    window.excluirOrcamentoSalvo = function(id) {
-        if (confirm('Tem certeza que deseja excluir este orçamento da lista? (Se estiver "Confirmado", o valor continuará salvo no Financeiro)')) {
-            const index = orcamentosSalvos.findIndex(o => o.id === id);
-            if (index > -1) {
-                orcamentosSalvos[index].excluido = true; 
-            }
-            localStorage.setItem('orcamentos_salvos_lista', JSON.stringify(orcamentosSalvos));
-            if (currentOrcamentoId === id) { 
-                currentOrcamentoId = null; 
-                localStorage.removeItem('orcamento_current_id');
-                document.getElementById('badgeOrcamentoAberto').style.display = 'none';
-            }
-            renderizarOrcamentosSalvosTab();
+    // ===== FUNÇÃO PARA NOVA PROPOSTA (BOTÃO) =====
+    function iniciarNovaProposta() { 
+        if (produtos.length > 0) {
+            if (confirm("Iniciar uma nova proposta? Todas as informações serão apagadas.")) { 
+                limparFormulario();
+                showToast('🔄 Nova proposta!', `OS Nº ${numeroOSInput.value} pronta para uso.`, true);
+            } 
+        } else {
+            limparFormulario();
+            showToast('🔄 Nova proposta!', `OS Nº ${numeroOSInput.value} pronta para uso.`, true);
         }
-    };
+    }
 
-    // ===== NOVO ORÇAMENTO =====
-    function iniciarNovoOrcamento() { 
-        if (confirm("Iniciar um novo orçamento? Limpará a tela e preparará a próxima OS.")) { 
-            produtos = []; 
-            if (editingIndex !== null) cancelarEdicao(); 
-            currentOrcamentoId = null; 
-            localStorage.removeItem('orcamento_current_id');
-            document.getElementById('badgeOrcamentoAberto').style.display = 'none';
-            clienteNomeInput.value = ''; 
-            clienteTelefoneInput.value = ''; 
-            clienteCpfCnpjInput.value = ''; 
-            prazoEntregaInput.value = ''; 
-            descontoInput.value = '0';
-            observacoesInput.value = '';
-            
-            statusOrcamentoSelect.value = "Orçamento"; 
-            atualizarCorStatus(statusOrcamentoSelect);
-            andamentoPedidoSelect.value = ""; 
-            atualizarCorAndamento(andamentoPedidoSelect);
-            
-            // Gera a próxima OS disponível automaticamente
-            numeroOSInput.value = getNextAvailableOS(); 
-            localStorage.setItem('orcamento_os_draft', numeroOSInput.value);
-            salvarClienteDraft(); 
-            salvarDadosOrcamentoDraft(); 
-            salvarProdutosDraft();
-            renderizarTabela(); 
-            atualizarTotalGeralUI();
-            
-            // Voltar para a aba Novo Pedido
-            document.querySelector('[data-tab="tabNovoPedido"]').click();
-        } 
+    function buscarClienteParaPedido() {
+        document.querySelector('[data-tab="tabBuscarCliente"]').click();
+        document.getElementById('buscarClienteInput').focus();
     }
 
     // ===== CONFIGURAÇÃO DA EMPRESA =====
@@ -1503,6 +1966,7 @@
         localStorage.setItem('empresa_config', JSON.stringify(empresaConfig));
         atualizarUIEmpresa();
         fecharModal('modalConfigEmpresa');
+        showToast('🏢 Empresa atualizada!', 'Dados da empresa salvos com sucesso.', true);
     }
 
     function configurarLogoUpload() {
@@ -1565,7 +2029,7 @@
         let total = 0;
         let textoPeriodo = "";
 
-        const confirmados = orcamentosSalvos.filter(o => o.status === "Confirmado");
+        const confirmados = propostasSalvas.filter(o => o.status === "Confirmado");
 
         if (filtro === 'mes_atual') {
             const nomesMeses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
@@ -1719,7 +2183,7 @@
         doc.text(formatarMoeda(somaTotal), pageWidth - marginRight - 5, finalY + 7, { align: 'right' });
 
         doc.save(`Relatorio_Vendas_${new Date().getTime()}.pdf`);
-        alert("✅ Relatório Financeiro PDF gerado com sucesso!");
+        showToast('📊 Relatório gerado!', 'PDF do relatório financeiro baixado com sucesso.', true);
     }
 
     // ===== PDF E WHATSAPP =====
@@ -1859,7 +2323,7 @@
         doc.setFontSize(16);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(secondaryColor[0], secondaryColor[1], secondaryColor[2]);
-        doc.text(`ORÇAMENTO Nº ${numOS}`, pageWidth - marginRight, y - 5, { align: 'right' });
+        doc.text(`PROPOSTA Nº ${numOS}`, pageWidth - marginRight, y - 5, { align: 'right' });
         
         doc.setFontSize(9);
         doc.setFont("helvetica", "normal");
@@ -1912,7 +2376,7 @@
         doc.setFontSize(10);
         doc.setFont("helvetica", "bold");
         doc.setTextColor(textColor[0], textColor[1], textColor[2]);
-        doc.text(statusOrcamentoSelect.value, middlePage + 10, y + 14);
+        doc.text(statusPropostaSelect.value, middlePage + 10, y + 14);
         
         if (andamentoPedidoSelect.value) {
             doc.setFontSize(9);
@@ -2048,8 +2512,8 @@
 
         const nomeClienteLimpo = cliente.nome.replace(/\s/g, '_').substring(0, 30);
         const dataStr = new Date().toISOString().slice(0, 10);
-        doc.save(`Orcamento_OS${numOS}_${nomeClienteLimpo}_${dataStr}.pdf`);
-        alert("✅ PDF de Orçamento gerado com sucesso!");
+        doc.save(`Proposta_OS${numOS}_${nomeClienteLimpo}_${dataStr}.pdf`);
+        showToast('📄 PDF gerado!', 'PDF da proposta baixado com sucesso.', true);
     }
 
     function enviarWhatsApp() {
@@ -2063,7 +2527,7 @@
         const numOS = numeroOSInput.value ? numeroOSInput.value.padStart(3, '0') : '001';
         const prazoText = prazoEntregaInput.value ? prazoEntregaInput.value : 'A combinar';
         
-        let headerTxt = `🏢 *ORÇAMENTO Nº ${numOS} - ${empresaConfig.nome}*\n📞 ${empresaConfig.telefone}\n`;
+        let headerTxt = `🏢 *PROPOSTA Nº ${numOS} - ${empresaConfig.nome}*\n📞 ${empresaConfig.telefone}\n`;
         if(empresaConfig.cnpj) headerTxt += `📄 CNPJ: ${empresaConfig.cnpj}\n`;
         if(empresaConfig.endereco && empresaConfig.cidade) headerTxt += `📍 ${empresaConfig.endereco} - ${empresaConfig.cidade}\n`;
 
@@ -2071,7 +2535,7 @@
         
         if(cliente.cpf) texto += `📄 CPF/CNPJ: ${cliente.cpf}\n`;
         
-        texto += `⏱️ Prazo: ${prazoText}\n📅 ${dataAtual}\n\n----------------------------------------\nITENS DO ORÇAMENTO:\n`;
+        texto += `⏱️ Prazo: ${prazoText}\n📅 ${dataAtual}\n\n----------------------------------------\nITENS DA PROPOSTA:\n`;
         produtos.forEach((p, i) => { 
             const tipoLabel = p.tipo || 'Produto';
             texto += `${i+1}. [${tipoLabel}] ${p.nome} | Qtd: ${p.quantidade} | Unit: ${formatarMoeda(p.precoUnitario)} | Subtotal: ${formatarMoeda(p.quantidade * p.precoUnitario)}\n`; 
@@ -2094,69 +2558,61 @@
         
         texto = texto.replace(/\*/g, '');
         window.open(`https://wa.me/?text=${encodeURIComponent(texto)}`, '_blank');
+        showToast('📱 WhatsApp aberto!', 'Mensagem da proposta pronta para enviar.', true);
     }
 
     // ===== CARREGAR DADOS SALVOS =====
     function carregarDadosSalvos() {
         atualizarUIEmpresa();
         
-        const nomeSalvo = localStorage.getItem('orcamento_cliente_nome');
-        const telefoneSalvo = localStorage.getItem('orcamento_cliente_telefone');
-        const cpfSalvo = localStorage.getItem('orcamento_cliente_cpf'); 
+        const nomeSalvo = localStorage.getItem('proposta_cliente_nome');
+        const telefoneSalvo = localStorage.getItem('proposta_cliente_telefone');
+        const cpfSalvo = localStorage.getItem('proposta_cliente_cpf'); 
         
         if (nomeSalvo) clienteNomeInput.value = nomeSalvo;
         if (telefoneSalvo) clienteTelefoneInput.value = telefoneSalvo;
         if (cpfSalvo) clienteCpfCnpjInput.value = cpfSalvo; 
         
-        const prazoSalvo = localStorage.getItem('orcamento_prazo');
+        const prazoSalvo = localStorage.getItem('proposta_prazo');
         if (prazoSalvo) prazoEntregaInput.value = prazoSalvo;
         
-        const statusSalvo = localStorage.getItem('orcamento_status_draft');
-        if (statusSalvo) { statusOrcamentoSelect.value = statusSalvo; atualizarCorStatus(statusOrcamentoSelect); }
+        const statusSalvo = localStorage.getItem('proposta_status_draft');
+        if (statusSalvo) { statusPropostaSelect.value = statusSalvo; atualizarCorStatus(statusPropostaSelect); }
         
-        const andamentoSalvo = localStorage.getItem('orcamento_andamento_draft');
+        const andamentoSalvo = localStorage.getItem('proposta_andamento_draft');
         if (andamentoSalvo) { andamentoPedidoSelect.value = andamentoSalvo; atualizarCorAndamento(andamentoPedidoSelect); }
 
-        const descontoSalvo = localStorage.getItem('orcamento_desconto');
+        const descontoSalvo = localStorage.getItem('proposta_desconto');
         if (descontoSalvo !== null) descontoInput.value = descontoSalvo;
 
-        const observacoesSalvo = localStorage.getItem('orcamento_observacoes');
+        const observacoesSalvo = localStorage.getItem('proposta_observacoes');
         if (observacoesSalvo !== null) observacoesInput.value = observacoesSalvo;
 
-        currentOrcamentoId = localStorage.getItem('orcamento_current_id');
-        const osDraft = localStorage.getItem('orcamento_os_draft');
+        currentPropostaId = localStorage.getItem('proposta_current_id');
+        const osDraft = localStorage.getItem('proposta_os_draft');
         
-        if (currentOrcamentoId && osDraft) { 
+        if (currentPropostaId && osDraft) { 
             numeroOSInput.value = osDraft;
-            document.getElementById('badgeOrcamentoAberto').style.display = 'inline-block';
+            document.getElementById('badgePropostaAberto').style.display = 'inline-block';
         } else { 
-            // Garante que sempre tenha um número de OS
-            numeroOSInput.value = getNextAvailableOS(); 
-            localStorage.setItem('orcamento_os_draft', numeroOSInput.value);
-            document.getElementById('badgeOrcamentoAberto').style.display = 'none';
+            const novaOS = getNextAvailableOS();
+            numeroOSInput.value = novaOS; 
+            localStorage.setItem('proposta_os_draft', novaOS);
+            document.getElementById('badgePropostaAberto').style.display = 'none';
         }
 
-        const prods = localStorage.getItem('orcamento_produtos_draft');
+        const prods = localStorage.getItem('proposta_produtos_draft');
         if (prods) { 
             produtos = JSON.parse(prods); 
         } else { 
-            adicionarExemploInicial(); 
+            produtos = []; 
         }
         
         atualizarTotalGeralUI();
         carregarTema();
         renderizarListaClientesBusca();
-    }
-
-    function adicionarExemploInicial() {
-        if (produtos.length === 0 && orcamentosSalvos.length === 0 && !currentOrcamentoId) { 
-            produtos.push({ tipo: "Produto", nome: "Cadeira Office", quantidade: 2, precoUnitario: 399.90 }, 
-                         { tipo: "Produto", nome: "Mesa Digital", quantidade: 1, precoUnitario: 789.00 }); 
-            renderizarTabela(); 
-            if (clienteNomeInput.value === "") { clienteNomeInput.value = "Cliente Exemplo"; clienteTelefoneInput.value = "(14) 90000-0000"; salvarClienteDraft(); }
-            if (prazoEntregaInput.value === "") { prazoEntregaInput.value = "5 dias úteis"; salvarDadosOrcamentoDraft(); }
-            if (observacoesInput.value === "") { observacoesInput.value = "Orçamento válido por 15 dias."; salvarDadosOrcamentoDraft(); }
-        }
+        renderizarUltimosClientes();
+        renderizarTabela();
     }
 
     // ===== FECHAR MODAL =====
@@ -2172,15 +2628,53 @@
         document.getElementById('btnAbrirConfig').addEventListener('click', abrirConfigEmpresa);
         document.getElementById('btnSalvarConfig').addEventListener('click', salvarConfigEmpresa);
         
-        document.getElementById('btnVerClientes').addEventListener('click', abrirModalClientes);
-        document.getElementById('btnSalvarClienteAba').addEventListener('click', salvarClienteDB);
-        
-        document.getElementById('btnSalvarOrcamento').addEventListener('click', salvarOrcamentoPermanente);
+        document.getElementById('btnSalvarProposta').addEventListener('click', salvarPropostaPermanente);
         document.getElementById('btnWhatsApp').addEventListener('click', enviarWhatsApp);
         document.getElementById('btnPDF').addEventListener('click', gerarPDF);
-        document.getElementById('btnLimpar').addEventListener('click', iniciarNovoOrcamento);
+        document.getElementById('btnLimpar').addEventListener('click', iniciarNovaProposta);
         
-        // Busca de clientes
+        document.getElementById('btnBuscarClienteParaPedido').addEventListener('click', buscarClienteParaPedido);
+        
+        // Cadastrar cliente
+        document.getElementById('btnCadastrarCliente').addEventListener('click', cadastrarCliente);
+        document.getElementById('btnLimparCadastro').addEventListener('click', limparCadastro);
+        
+        // ===== SUGESTÃO AUTOMÁTICA DE CLIENTES =====
+        clienteNomeInput.addEventListener('input', function() {
+            const termo = this.value;
+            const resultados = buscarSugestoesClientes(termo);
+            renderizarSugestoes(resultados);
+        });
+        
+        clienteNomeInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                document.getElementById('suggestionsContainer').classList.remove('show');
+            }
+            if (e.key === 'Enter') {
+                const container = document.getElementById('suggestionsContainer');
+                const firstItem = container.querySelector('.suggestion-item');
+                if (firstItem) {
+                    firstItem.click();
+                }
+            }
+        });
+        
+        clienteNomeInput.addEventListener('blur', function() {
+            setTimeout(() => {
+                document.getElementById('suggestionsContainer').classList.remove('show');
+            }, 300);
+        });
+        
+        // Fechar sugestões ao clicar fora
+        document.addEventListener('click', function(e) {
+            const container = document.getElementById('suggestionsContainer');
+            const input = document.getElementById('clienteNome');
+            if (!container.contains(e.target) && e.target !== input) {
+                container.classList.remove('show');
+            }
+        });
+        
+        // Busca de clientes (tab)
         const buscarInput = document.getElementById('buscarClienteInput');
         buscarInput.addEventListener('input', function() {
             const termo = this.value;
@@ -2198,26 +2692,24 @@
             }
         });
         
-        document.addEventListener('click', function(e) {
-            const container = document.getElementById('searchResults');
-            const input = document.getElementById('buscarClienteInput');
-            if (!container.contains(e.target) && e.target !== input) {
-                container.classList.remove('show');
-            }
-        });
-        
         document.getElementById('btnLimparBusca').addEventListener('click', limparBuscaCliente);
         document.getElementById('btnUsarClienteBusca').addEventListener('click', usarClienteNoPedido);
         document.getElementById('btnEditarClienteBusca').addEventListener('click', editarClienteBusca);
+        document.getElementById('btnExcluirClienteBusca').addEventListener('click', excluirClienteBusca);
         document.getElementById('btnSalvarEdicaoCliente').addEventListener('click', salvarEdicaoCliente);
         
         // Tabs
         initTabs();
         
-        // Editar cliente modal - fechar com ESC
+        // Fechar modais com ESC
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 fecharModal('modalEditarCliente');
+                fecharModal('modalListaClientes');
+                fecharModal('modalConfigEmpresa');
+                fecharModal('modalEditarProposta');
+                document.getElementById('suggestionsContainer').classList.remove('show');
+                document.getElementById('searchResults').classList.remove('show');
             }
         });
         
@@ -2233,11 +2725,11 @@
         clienteNomeInput.addEventListener('input', salvarClienteDraft);
         clienteTelefoneInput.addEventListener('input', salvarClienteDraft);
         clienteCpfCnpjInput.addEventListener('input', salvarClienteDraft);
-        prazoEntregaInput.addEventListener('input', salvarDadosOrcamentoDraft);
-        statusOrcamentoSelect.addEventListener('change', salvarDadosOrcamentoDraft);
-        andamentoPedidoSelect.addEventListener('change', salvarDadosOrcamentoDraft);
-        descontoInput.addEventListener('input', function() { salvarDadosOrcamentoDraft(); atualizarTotalGeralUI(); });
-        observacoesInput.addEventListener('input', salvarDadosOrcamentoDraft);
+        prazoEntregaInput.addEventListener('input', salvarDadosPropostaDraft);
+        statusPropostaSelect.addEventListener('change', salvarDadosPropostaDraft);
+        andamentoPedidoSelect.addEventListener('change', salvarDadosPropostaDraft);
+        descontoInput.addEventListener('input', function() { salvarDadosPropostaDraft(); atualizarTotalGeralUI(); });
+        observacoesInput.addEventListener('input', salvarDadosPropostaDraft);
     }
 
     carregarDadosSalvos();
